@@ -1,6 +1,9 @@
 .topbar { position: relative; z-index: 10; }
 .inner { display: flex; align-items: center; gap: var(--s-6); height: 84px; }
 
+/* Stüdyo: daha geniş içerik ve biraz alçak bar */
+.inner.wide { max-width: 1600px; padding: 0 var(--s-6); height: 76px; }
+
 .logo {
   display: inline-flex;
   align-items: center;

@@ -14,7 +14,7 @@ const NAV = [
   { href: "#", label: "Doğrula" },
 ];
 
-export default function TopBar() {
+export default function TopBar({ wide = false }: { wide?: boolean }) {
   const pathname = usePathname();
   const [wallet, setWallet] = useState<WalletState>("idle");
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -32,7 +32,7 @@ export default function TopBar() {
 
   return (
     <header className={s.topbar}>
-      <div className={`container ${s.inner}`}>
+      <div className={`container ${s.inner} ${wide ? s.wide : ""}`}>
         <Link className={s.logo} href="/" aria-label="Sketch2Design ana sayfa">
           <svg aria-hidden="true" width="46" height="36" viewBox="0 0 46 36">
             <path d="M3 28 Q6 21 9.5 25 T16 22.5" fill="none" stroke="var(--chalk)" strokeWidth="2.4" strokeLinecap="round" />

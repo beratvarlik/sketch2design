@@ -7,9 +7,11 @@ interface CharacterProps {
   size?: number;
   /** Açılış akışındaki sıra (0–4): karakter sırayla zıplar. */
   relay?: number;
+  /** Arada bir merakla kafasını uzatır (boş kağıt ipucu). */
+  curious?: boolean;
 }
 
-export default function Character({ id, state = "portrait", size = 168, relay }: CharacterProps) {
+export default function Character({ id, state = "portrait", size = 168, relay, curious }: CharacterProps) {
   const c = makeChar(id, state, size);
   return (
     <svg
@@ -17,6 +19,7 @@ export default function Character({ id, state = "portrait", size = 168, relay }:
       data-agent={id}
       data-state={state}
       data-relay={relay}
+      data-curious={curious || undefined}
       viewBox="0 0 240 250"
       width={c.w}
       height={c.h}

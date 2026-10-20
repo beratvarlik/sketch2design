@@ -75,6 +75,10 @@
 .ch[data-relay="3"] .hop { animation-delay: 3s; }
 .ch[data-relay="4"] .hop { animation-delay: 4s; }
 
+/* boş kağıt ipucu: arada kafasını uzatır */
+.ch[data-curious] .hop { animation: peek 4s ease-in-out infinite; }
+
+@keyframes peek { 0%, 70%, 100% { transform: translateY(0) rotate(0); } 78% { transform: translateY(-8px) rotate(-4deg); } 86% { transform: translateY(0) rotate(3deg); } }
 @keyframes relay { 0%, 14%, 100% { transform: translateY(0); } 5% { transform: translateY(-18px); } 10% { transform: translateY(0) scale(1.06, 0.94); } }
 @keyframes breathe { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(0.982, 1.035); } }
 @keyframes hopY { 0%, 15%, 85%, 100% { transform: translateY(0); } 50% { transform: translateY(-16px); } }
