@@ -1,0 +1,32 @@
+.wrap {
+  display: inline-block;
+  line-height: 0;
+  font-family: var(--mono);
+  color: var(--pencil);
+}
+
+.paper { fill: var(--paper); }
+.square { fill: none; stroke: var(--paper-line); stroke-width: 0.6; }
+.margin { stroke: var(--paper-margin); stroke-width: 1; }
+
+.pencil {
+  fill: none;
+  stroke: var(--pencil);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.ghost { stroke-width: 1.4; opacity: 0.35; }
+.line { stroke-width: 2.4; }
+
+.note { font-family: var(--hand); font-size: 17px; font-weight: 600; fill: var(--pencil-2); }
+.noteArrow { fill: none; stroke: var(--pencil-2); stroke-width: 1.6; stroke-linecap: round; }
+
+.col { fill: var(--accent-soft); }
+.guide { fill: none; stroke: var(--accent-ink); stroke-width: 1.3; }
+
+/* tespit kutuları */
+.box { fill: color-mix(in srgb, var(--accent) 8%, transparent); stroke: var(--accent-ink); stroke-width: 1.8; }
+.tag { fill: var(--accent-ink); }
+.boxUnsure { fill: color-mix(in srgb, var(--warn) 16%, transparent); stroke: color-mix(in srgb, var(--warn) 55%, black); }
+.tagUnsure { fill: color-mix(in srgb, var(--warn) 55%, black); }
+.tagText { font-family: var(--mono); font-size: 10.5px; fill: #fff; }

@@ -1,0 +1,226 @@
+/* Çıktı tasarımı kullanıcının üretilen sayfasıdır; arayüz tokenlarından bağımsız kendi paleti var. */
+.root {
+  --o-primary: var(--accent);
+  --o-accent-2: #FFB84D;
+  --o-bg: #FFFDF8;
+  --o-ink: #17162A;
+  --o-sub: #4A4760;
+  --o-ink-4: #ABA6C6;
+  --o-sub-4: #C6C2D8;
+  --o-ink-5: #8F8AAE;
+  --o-sub-5: #AEAAC4;
+  --o-btn-4: #C7BEFF;
+  --o-btn-5: #ADA0FF;
+  --o-card: #F1EEFF;
+  --o-dash: #C9C4B8;
+  --o-block-1: #E4E0D6;
+  --o-block-2: #E8E4F4;
+  --o-empty-bg: #16181E;
+  --o-grid: rgba(255, 138, 61, 0.16);
+
+  position: relative;
+  width: 300px;
+  height: 520px;
+  overflow: hidden;
+  box-sizing: border-box;
+  padding: 18px;
+  background: var(--bg);
+  font-family: var(--body);
+  color: var(--o-ink);
+  line-height: 1.2;
+  transition: background 0.5s ease;
+}
+
+.grid {
+  position: absolute;
+  inset: 0;
+  padding: 0 18px;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 6px;
+  opacity: var(--grid-op);
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+.grid span { background: var(--o-grid); }
+
+.content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  opacity: var(--show);
+  transition: opacity 0.5s ease;
+}
+
+.nav { display: flex; align-items: center; gap: 8px; height: 22px; }
+.dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  box-sizing: border-box;
+  background: var(--primary);
+  border: var(--bord);
+  transition: all 0.5s ease;
+}
+.brand {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--tc);
+  background: var(--tb);
+  border-radius: 4px;
+  transition: all 0.5s ease;
+}
+.menu {
+  margin-left: auto;
+  display: flex;
+  gap: 10px;
+  font-size: 11px;
+  color: var(--sc);
+  transition: all 0.5s ease;
+}
+.menu span { background: var(--tb); border-radius: 3px; }
+
+.titleWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 6px;
+  transform: var(--t-title);
+  transform-origin: 0 0;
+  transition: transform 0.6s ease;
+}
+.title {
+  align-self: flex-start;
+  font-family: var(--display);
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  color: var(--tc);
+  background: var(--tb);
+  border-radius: 6px;
+  transition: all 0.5s ease;
+}
+.lead {
+  align-self: flex-start;
+  font-size: 13px;
+  color: var(--sc);
+  background: var(--tb);
+  border-radius: 4px;
+  transition: all 0.5s ease;
+}
+
+.image {
+  position: relative;
+  height: var(--img-h);
+  border-radius: 14px;
+  box-sizing: border-box;
+  background: var(--img-bg);
+  border: var(--bord);
+  overflow: hidden;
+  transition: all 0.6s ease;
+}
+.image svg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: var(--ill-op);
+  transition: opacity 0.5s ease;
+}
+
+.cta {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 18px;
+  border-radius: 12px;
+  box-sizing: border-box;
+  font-size: 14px;
+  font-weight: 700;
+  background: var(--btn-bg);
+  color: var(--btn-txt);
+  border: var(--bord);
+  transform: var(--t-btn);
+  transition: all 0.6s ease;
+}
+
+.cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  border-radius: 12px;
+  box-sizing: border-box;
+  background: var(--card-bg);
+  border: var(--bord);
+  transition: all 0.5s ease;
+}
+.cardMove { transform: var(--t-card); }
+.icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  box-sizing: border-box;
+  border: var(--bord);
+}
+.cardTitle {
+  align-self: flex-start;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--tc);
+  background: var(--tb);
+  border-radius: 3px;
+}
+.cardSub {
+  align-self: flex-start;
+  font-size: 10.5px;
+  color: var(--sc);
+  background: var(--tb);
+  border-radius: 3px;
+}
+.copy {
+  align-self: flex-start;
+  font-size: 10px;
+  color: var(--sc);
+  background: var(--tb);
+  border-radius: 3px;
+}
+
+.empty {
+  position: absolute;
+  inset: 14px;
+  border: 2px dashed var(--faint);
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 18px;
+  text-align: center;
+}
+
+.sealed {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--c-notary) 22%, var(--ink));
+  color: color-mix(in srgb, var(--c-notary) 55%, white);
+  border: 2px solid var(--c-notary);
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 6px 18px -6px var(--c-notary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root, .root * { transition: none !important; }
+}
