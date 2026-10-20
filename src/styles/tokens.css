@@ -1,0 +1,81 @@
+/* Sketch2Design — tasarım tokenları
+   Fontlar: https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Caveat:wght@500;700&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap */
+
+:root {
+  /* zemin ve yüzeyler (sıcak koyu) */
+  --bg: #14120F;
+  --surface: #1E1B17;
+  --surface-2: #26221D;
+  --surface-3: #2E2A24;
+  --line: rgba(241, 236, 226, 0.10);
+  --line-strong: rgba(241, 236, 226, 0.22);
+
+  /* metin (kırık beyaz) */
+  --text: #F1ECE2;
+  --text-2: #CFC8BB;
+  --muted: #A39B8D;
+  --faint: #8A8275;
+  --chalk: #CFC8BB;           /* el çizimi oklar, karalamalar */
+
+  /* kağıt (kroki bölgesi) */
+  --paper: #F3EEE3;
+  --paper-line: rgba(70, 110, 170, 0.18);  /* kareli kağıt çizgisi */
+  --paper-margin: rgba(200, 80, 70, 0.32); /* kenar kırmızı çizgi */
+  --pencil: #2B2925;
+  --pencil-2: #5A544A;
+  --tape: rgba(226, 210, 166, 0.60);
+
+  /* tek vurgu: Monad moru */
+  --accent: #6E54FF;
+  --accent-hover: #7F68FF;
+  --accent-text: #A898FF;       /* koyu zeminde link/metin */
+  --accent-soft: rgba(110, 84, 255, 0.14);
+  --accent-ink: #5B43E0;        /* kağıt üstünde tespit kutuları */
+  --focus: #C9BEFF;
+
+  /* işlevsel durumlar */
+  --success: #3FBF6E;
+  --success-text: #86DDA6;
+  --danger: #E5484D;
+  --danger-text: #FF9A94;
+  --warn: #E8A21A;
+
+  /* agent renkleri — SADECE karakterler ve zaman çizelgesi */
+  --c-reader: #4C8DFF;
+  --c-designer: #FF8A3D;
+  --c-generator: #9B6BFF;
+  --c-critic: #FF4D5E;
+  --c-notary: #2DD4CF;
+  --ink: #0B0B0F;               /* karakter dış çizgisi */
+
+  /* radius */
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 18px;
+
+  /* boşluk */
+  --s-1: 4px;  --s-2: 8px;  --s-3: 12px; --s-4: 16px; --s-5: 24px;
+  --s-6: 32px; --s-7: 48px; --s-8: 72px; --s-9: 120px;
+
+  /* font aileleri */
+  --display: var(--font-bricolage), system-ui, sans-serif;  /* başlıklar, 800, sıkı */
+  --body: var(--font-geist), system-ui, sans-serif;                    /* sistem metni */
+  --mono: var(--font-geist-mono), ui-monospace, monospace;             /* hash, JSON, süre */
+  --hand: var(--font-caveat), cursive;                                 /* kullanıcı + kroki + karakter sesi */
+}
+
+.ag-reader    { --agent-color: var(--c-reader); }
+.ag-designer  { --agent-color: var(--c-designer); }
+.ag-generator { --agent-color: var(--c-generator); }
+.ag-critic    { --agent-color: var(--c-critic); }
+.ag-notary    { --agent-color: var(--c-notary); }
+
+/* sol → sağ solan kareli kağıt dokusu */
+.gridpaper {
+  position: absolute; inset: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(241,236,226,.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(241,236,226,.055) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: linear-gradient(90deg, #000 0%, rgba(0,0,0,.5) 25%, transparent 55%);
+}
