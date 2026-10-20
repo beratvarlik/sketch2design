@@ -1,0 +1,71 @@
+.member {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  border-radius: var(--r-lg);
+}
+
+.spot {
+  position: absolute;
+  top: 150px;
+  left: 50%;
+  width: 150px;
+  height: 110px;
+  margin-left: -75px;
+  border-radius: 50%;
+  background: var(--agent-color);
+  filter: blur(46px);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+.spot[data-on="true"] { opacity: 0.32; }
+
+.quote {
+  position: relative;
+  min-height: 84px;
+  display: flex;
+  align-items: flex-end;
+  margin-bottom: 10px;
+}
+
+.bubble {
+  position: relative;
+  padding: 8px 14px 10px;
+  background: var(--paper);
+  color: var(--pencil);
+  font-family: var(--hand);
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 1.02;
+  border-radius: 16px 20px 18px 14px / 14px 18px 20px 16px;
+  transform: rotate(-1.5deg);
+}
+.bubble::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  margin-left: -8px;
+  border-left: 8px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 12px solid var(--paper);
+}
+.member:nth-child(even) .bubble { transform: rotate(1.4deg); }
+
+.name {
+  margin-top: 18px;
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 30px;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.role { font-size: 17px; color: var(--muted); }
+
+@media (prefers-reduced-motion: reduce) {
+  .spot { transition: none; }
+}

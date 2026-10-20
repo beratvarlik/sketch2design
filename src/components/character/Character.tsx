@@ -5,15 +5,18 @@ interface CharacterProps {
   id: CharacterId;
   state?: CharacterState;
   size?: number;
+  /** Açılış akışındaki sıra (0–4): karakter sırayla zıplar. */
+  relay?: number;
 }
 
-export default function Character({ id, state = "portrait", size = 168 }: CharacterProps) {
+export default function Character({ id, state = "portrait", size = 168, relay }: CharacterProps) {
   const c = makeChar(id, state, size);
   return (
     <svg
       className={`${s.ch} ag-${id}`}
       data-agent={id}
       data-state={state}
+      data-relay={relay}
       viewBox="0 0 240 250"
       width={c.w}
       height={c.h}

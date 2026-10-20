@@ -68,6 +68,14 @@
 /* error */
 .ch[data-state="error"] .hop { animation: wobble 1.8s ease-in-out infinite; }
 
+/* açılış akışı: sırayla zıplama */
+.ch[data-relay] .hop { animation: relay 5s ease-in-out infinite; }
+.ch[data-relay="1"] .hop { animation-delay: 1s; }
+.ch[data-relay="2"] .hop { animation-delay: 2s; }
+.ch[data-relay="3"] .hop { animation-delay: 3s; }
+.ch[data-relay="4"] .hop { animation-delay: 4s; }
+
+@keyframes relay { 0%, 14%, 100% { transform: translateY(0); } 5% { transform: translateY(-18px); } 10% { transform: translateY(0) scale(1.06, 0.94); } }
 @keyframes breathe { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(0.982, 1.035); } }
 @keyframes hopY { 0%, 15%, 85%, 100% { transform: translateY(0); } 50% { transform: translateY(-16px); } }
 @keyframes hopHigh { 0%, 12%, 88%, 100% { transform: translateY(0); } 50% { transform: translateY(-26px); } }
