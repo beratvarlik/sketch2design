@@ -1,0 +1,521 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Sketch2Design — Stüdyo</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&amp;family=Caveat:wght@500;700&amp;family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#14120F}
+a{color:#A898FF}a:hover{color:#C9BEFF}
+
+/* ---------- TOKENLAR (Açılış ile aynı) ---------- */
+.app{
+  --bg:#14120F;--surface:#1E1B17;--surface-2:#26221D;--surface-3:#2E2A24;
+  --line:rgba(241,236,226,.10);--line-strong:rgba(241,236,226,.22);
+  --text:#F1ECE2;--text-2:#CFC8BB;--muted:#A39B8D;--faint:#8A8275;--chalk:#CFC8BB;
+  --paper:#F3EEE3;--paper-line:rgba(70,110,170,.18);--pencil:#2B2925;--pencil-2:#5A544A;
+  --accent:#6E54FF;--accent-hover:#7F68FF;--accent-text:#A898FF;--accent-soft:rgba(110,84,255,.14);--focus:#C9BEFF;
+  --success:#3FBF6E;--success-text:#86DDA6;--danger:#E5484D;--danger-text:#FF9A94;
+  --c-reader:#4C8DFF;--ink:#0B0B0F;
+  --r-sm:8px;--r-md:12px;--r-lg:18px;
+  --s-1:4px;--s-2:8px;--s-3:12px;--s-4:16px;--s-5:24px;--s-6:32px;--s-7:48px;
+  --display:'Bricolage Grotesque',system-ui,sans-serif;--body:'Geist',system-ui,sans-serif;--mono:'Geist Mono',ui-monospace,monospace;--hand:'Caveat',cursive;
+  background:var(--bg);color:var(--text);font-family:var(--body);font-size:17px;line-height:1.45;min-height:100vh;position:relative;overflow-x:hidden
+}
+.ag-reader{--agent-color:var(--c-reader)}
+.disp{font-family:var(--display)}.mono{font-family:var(--mono)}.hand{font-family:var(--hand)}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.container{max-width:1600px;margin:0 auto;padding:0 var(--s-6);box-sizing:border-box}
+.gridpaper{position:absolute;left:0;right:0;top:0;bottom:0;pointer-events:none;background-image:linear-gradient(rgba(241,236,226,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(241,236,226,.05) 1px,transparent 1px);background-size:28px 28px;-webkit-mask-image:linear-gradient(90deg,#000 0%,rgba(0,0,0,.4) 30%,transparent 60%);mask-image:linear-gradient(90deg,#000 0%,rgba(0,0,0,.4) 30%,transparent 60%)}
+
+/* ---------- ÜST BAR ---------- */
+.topbar{position:relative;z-index:10}
+.topbar-in{display:flex;align-items:center;gap:var(--s-6);height:76px}
+.logo{display:inline-flex;align-items:center;gap:10px;color:var(--text);text-decoration:none;font-family:var(--display);font-weight:800;font-size:23px;letter-spacing:-.02em}
+.logo:hover{color:var(--text)}
+.nav{display:flex;gap:var(--s-5);margin-left:var(--s-5)}
+.nav a{position:relative;padding:8px 2px;color:var(--text-2);text-decoration:none;font-weight:500;font-size:18px}
+.nav a:hover{color:var(--text)}
+.nav a.is-on{color:var(--text)}
+.nav a.is-on::after{content:'';position:absolute;left:-2px;right:-2px;bottom:0;height:6px;background:no-repeat center/100% 100% url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 6' preserveAspectRatio='none'%3E%3Cpath d='M1 4 Q15 1 30 3.5 T59 2.5' fill='none' stroke='%23F1ECE2' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E")}
+.wallet{margin-left:auto;display:inline-flex;align-items:center;gap:14px}
+.net{font-size:16px;color:var(--muted)}
+.addr{appearance:none;display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 14px;border-radius:var(--r-md);background:transparent;border:1px solid var(--line-strong);color:var(--text);font-family:var(--mono);font-size:16px;cursor:pointer}
+.addr:hover{background:var(--surface)}
+.dot-ok{width:8px;height:8px;border-radius:50%;background:var(--success)}
+
+/* ---------- BUTONLAR / ALANLAR ---------- */
+.btn{appearance:none;font:inherit;cursor:pointer;border:0;display:inline-flex;align-items:center;justify-content:center;gap:10px;height:46px;padding:0 18px;border-radius:var(--r-md);font-size:17px;font-weight:600;text-decoration:none;transition:transform .15s ease,background .2s ease;white-space:nowrap}
+.btn:hover{transform:translateY(-1px)}
+.btn:focus-visible,.nav a:focus-visible,.logo:focus-visible,.addr:focus-visible,.tool:focus-visible,.tool:focus-within,.fcard:focus-visible,.pal:focus-visible,.x:focus-visible,.upl:focus-within{outline:3px solid var(--focus);outline-offset:3px}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-hover);color:#fff}
+.btn-outline{background:transparent;color:var(--text);border:1.5px solid var(--line-strong)}
+.btn-outline:hover{background:var(--surface);color:var(--text)}
+.btn-ink{background:#1A1814;color:#F3EEE3}
+.btn-ink:hover{background:#2B2925;color:#F3EEE3}
+.btn-ink-2{background:transparent;color:#1A1814;border:2px solid #1A1814}
+.btn-xl{height:68px;width:100%;font-size:22px;font-weight:700;border-radius:14px}
+.btn[disabled]{opacity:.4;cursor:not-allowed;transform:none}
+.spin{width:16px;height:16px;border-radius:50%;border:2.5px solid rgba(255,255,255,.35);border-top-color:#fff;animation:spin .8s linear infinite}
+.field{width:100%;box-sizing:border-box;height:52px;border-radius:var(--r-md);background:var(--surface);border:1px solid var(--line-strong);color:var(--text);padding:0 14px;font:inherit;font-size:18px}
+.field::placeholder{color:var(--faint)}
+.field:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(110,84,255,.35)}
+.title-in{background:transparent;border:1px solid transparent;color:var(--text);font-family:var(--display);font-size:40px;font-weight:800;letter-spacing:-.035em;padding:2px 8px;margin-left:-9px;border-radius:10px;width:440px}
+.title-in:hover{border-color:var(--line-strong)}
+.title-in:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(110,84,255,.35)}
+
+/* ---------- KARAKTER ---------- */
+.ch-svg{--fill:var(--agent-color);overflow:visible;display:block}
+.ch-svg .ol{stroke:var(--ink);stroke-width:5;stroke-linejoin:round}
+.ch-svg .tint{fill:var(--fill)}
+.ch-svg .white{fill:#fff;stroke-width:4}
+.ch-svg .pupil{fill:var(--ink)}.ch-svg .glint{fill:#fff}
+.ch-svg .brow{fill:none;stroke:var(--ink);stroke-width:5;stroke-linecap:round}
+.ch-svg .mouth{stroke:var(--ink);stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+.ch-svg .m-fill{fill:#3A0F1A}
+.ch-svg .shadow{fill:#000;opacity:.16}
+.ch-svg .antenna{fill:none;stroke:var(--ink);stroke-width:5;stroke-linecap:round}
+.ch-svg .shade{fill:rgba(0,0,0,.16)}
+.ch-svg .shine{fill:none;stroke:rgba(255,255,255,.45);stroke-width:6;stroke-linecap:round}
+.hop,.squash{transform-box:fill-box;transform-origin:50% 100%}
+.st-portrait .squash{animation:breathe 3.6s ease-in-out infinite}
+.st-curious .hop{animation:peek 4s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(1,1)}50%{transform:scale(.982,1.035)}}
+@keyframes peek{0%,70%,100%{transform:translateY(0) rotate(0)}78%{transform:translateY(-8px) rotate(-4deg)}86%{transform:translateY(0) rotate(3deg)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---------- STÜDYO ---------- */
+.subbar{display:flex;align-items:baseline;gap:var(--s-5);padding-top:var(--s-4);flex-wrap:wrap}
+.saved{color:var(--faint);font-size:16px}
+.fmt-now{margin-left:auto;font-size:17px;color:var(--muted)}
+.studio{display:grid;grid-template-columns:76px minmax(0,1fr) 400px;gap:var(--s-6);padding-top:var(--s-4);padding-bottom:var(--s-6)}
+.toolbar{display:flex;flex-direction:column;gap:4px;align-self:start;padding-top:6px}
+.tool{position:relative;appearance:none;cursor:pointer;width:60px;height:54px;border-radius:12px;border:0;background:transparent;color:var(--text-2);display:flex;align-items:center;justify-content:center;font:inherit;transition:background .15s ease,color .15s ease}
+.tool:hover{background:var(--surface);color:var(--text)}
+.tool.is-on{background:var(--paper);color:#1A1814}
+.tool.is-on::before{content:'';position:absolute;left:-10px;top:14px;bottom:14px;width:3px;border-radius:2px;background:var(--paper)}
+.tool:disabled{opacity:.3;cursor:not-allowed}
+.tool[data-tip]:hover::after,.tool[data-tip]:focus-visible::after{content:attr(data-tip);position:absolute;left:calc(100% + 12px);top:50%;transform:translateY(-50%);padding:6px 11px;border-radius:8px;background:var(--paper);color:#1A1814;font-family:var(--hand);font-size:22px;font-weight:600;white-space:nowrap;z-index:20;pointer-events:none}
+.tsep{height:1px;background:var(--line);margin:8px 10px}
+.stage-col{display:flex;flex-direction:column;gap:var(--s-3);min-width:0}
+.stage{container-type:size;height:720px;display:flex;align-items:center;justify-content:center;padding:12px 24px;box-sizing:border-box}
+.paper{position:relative;width:min(100cqw,calc(100cqh * var(--r)));aspect-ratio:var(--r);background-color:var(--paper);background-image:linear-gradient(var(--paper-line) 1px,transparent 1px),linear-gradient(90deg,var(--paper-line) 1px,transparent 1px);background-size:22px 22px;box-shadow:0 30px 70px -30px #000;touch-action:none;cursor:crosshair;overflow:hidden;user-select:none;transform:rotate(-.4deg)}
+.paper::before{content:'';position:absolute;top:0;bottom:0;left:34px;width:1px;background:rgba(200,80,70,.32);pointer-events:none}
+.tape{position:absolute;width:86px;height:24px;background:rgba(226,210,166,.6);z-index:3;pointer-events:none}
+.fmt-poster{--r:.75}.fmt-post{--r:1}.fmt-deck{--r:1.7778}.fmt-web{--r:1.6}.fmt-mobile{--r:.4615}
+.t-eraser{cursor:cell}.t-note{cursor:text}
+.layer{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.layer path{fill:none;stroke:var(--pencil);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.layer.draft path{stroke:var(--pencil-2);stroke-dasharray:6 5}
+.note{position:absolute;transform:translateY(-55%) rotate(-3deg);font-family:var(--hand);font-weight:700;font-size:26px;line-height:1;color:#3A3730;pointer-events:none;white-space:nowrap}
+.upimg{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none}
+.empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;pointer-events:none;padding:24px;text-align:center}
+.hint{position:relative;max-width:360px;padding:12px 18px 14px;background:#1A1814;color:#F3EEE3;font-family:var(--hand);font-weight:600;font-size:28px;line-height:1.05;border-radius:18px 22px 20px 15px / 15px 20px 22px 18px;transform:rotate(-1.5deg)}
+.hint::after{content:'';position:absolute;bottom:-11px;left:50%;margin-left:-8px;border-left:8px solid transparent;border-right:6px solid transparent;border-top:13px solid #1A1814}
+.empty-actions{display:flex;gap:10px;pointer-events:auto;flex-wrap:wrap;justify-content:center;margin-top:8px}
+.upl{position:relative;cursor:pointer}
+.stage-foot{display:flex;justify-content:space-between;align-items:center;gap:var(--s-4);flex-wrap:wrap;font-size:16px;color:var(--muted);padding:0 24px}
+.sel{height:40px;border-radius:10px;background:var(--surface);border:1px solid var(--line-strong);color:var(--text);font:inherit;font-size:16px;padding:0 10px}
+.sel:focus{outline:3px solid var(--focus);outline-offset:2px}
+.x{appearance:none;cursor:pointer;width:32px;height:32px;border-radius:8px;border:0;background:transparent;color:var(--text-2);display:inline-flex;align-items:center;justify-content:center}
+.x:hover{background:var(--surface-2);color:var(--text)}
+.upchip{display:inline-flex;align-items:center;gap:8px;color:var(--text-2)}
+.err{color:var(--danger-text);font-weight:600}
+.panel{display:flex;flex-direction:column;align-self:start}
+.psec{padding:22px 0 26px;display:flex;flex-direction:column;gap:16px;border-top:1px solid var(--line)}
+.psec:first-child{border-top:0;padding-top:4px}
+.ptitle{display:flex;align-items:baseline;gap:12px;margin:0;font-family:var(--display);font-weight:800;font-size:26px;letter-spacing:-.025em;line-height:1.1}
+.pnum{font-family:var(--mono);font-size:15px;color:var(--faint);font-weight:400;letter-spacing:0}
+.pnote{margin-left:auto;font-family:var(--body);font-size:15px;font-weight:500;color:var(--faint);letter-spacing:0}
+.pnote.req{color:var(--danger-text)}
+.pnote.ok{color:var(--success-text)}
+.fmt-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.fcard{appearance:none;font:inherit;cursor:pointer;text-align:left;display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:var(--r-md);background:var(--surface);border:2px solid transparent;color:var(--text);transition:border-color .15s ease,background .15s ease}
+.fcard:hover{background:var(--surface-2)}
+.fcard.is-on{border-color:var(--accent);background:var(--accent-soft)}
+.fcard.span2{grid-column:1/-1}
+.fshape{flex:none;border:2px solid currentColor;border-radius:3px;box-sizing:border-box}
+.fbox{width:44px;height:40px;display:flex;align-items:center;justify-content:center;flex:none;color:var(--text-2)}
+.fcard.is-on .fbox{color:var(--text)}
+.pal-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.pal{appearance:none;font:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:10px 12px;border-radius:var(--r-md);background:var(--surface);border:2px solid transparent;color:var(--text);text-align:left}
+.pal:hover{background:var(--surface-2)}
+.pal.is-on{border-color:var(--accent);background:var(--accent-soft)}
+.pal.wide{grid-column:1/-1;flex-direction:row;align-items:center;gap:12px}
+.sw{display:flex}.sw span{width:24px;height:24px;border-radius:5px;margin-right:4px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+.color-in{width:44px;height:44px;padding:0;border:1px solid var(--line-strong);border-radius:10px;background:var(--surface);cursor:pointer}
+.color-in:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.cchip{display:inline-flex;align-items:center;gap:6px;padding:4px 4px 4px 8px;border-radius:8px;background:var(--surface);font-family:var(--mono);font-size:15px}
+
+@media (max-width:1180px){
+  .studio{grid-template-columns:76px minmax(0,1fr)}
+  .panel{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:var(--s-6)}
+  .psec:first-child{padding-top:22px;border-top:1px solid var(--line)}
+  .psec.go,.psec.fmt-sec{grid-column:1/-1}
+}
+@media (max-width:820px){
+  .container{padding:0 var(--s-5)}
+  .nav{gap:var(--s-4);margin-left:0}
+  .logo-word,.net{display:none}
+  .studio{grid-template-columns:1fr}
+  .toolbar{flex-direction:row;flex-wrap:wrap;justify-content:center;padding-top:0}
+  .tool.is-on::before{display:none}
+  .tsep{width:1px;height:auto;margin:8px 4px}
+  .tool[data-tip]:hover::after,.tool[data-tip]:focus-visible::after{left:50%;top:calc(100% + 8px);transform:translateX(-50%)}
+  .stage{height:560px;padding:12px}
+  .panel{grid-template-columns:1fr}
+  .fmt-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .fcard.span2{grid-column:auto}
+  .title-in{width:260px;font-size:30px}
+  .stage-foot{padding:0}
+}
+@media (prefers-reduced-motion:reduce){.app *{animation:none !important;transition:none !important}}
+</style>
+</helmet>
+<div class="app">
+<div class="gridpaper" aria-hidden="true"></div>
+
+<header class="topbar">
+<div class="container topbar-in">
+<a class="logo" href="Landing.dc.html" aria-label="Sketch2Design ana sayfa">
+<svg aria-hidden="true" width="46" height="36" viewBox="0 0 46 36"><path d="M3 28 Q6 21 9.5 25 T16 22.5" fill="none" stroke="#CFC8BB" stroke-width="2.4" stroke-linecap="round"></path><path d="M27.5 8.5 C31 8 33.5 13 35 18 C36.5 23.5 37 28 36 30 C35 31.6 32 31.8 27.5 31.6 C23 31.8 20 31.6 19.2 30 C18.4 28 19 23.5 20.6 18 C22.2 13 24 8.8 27.5 8.5 Z" fill="none" stroke="#CFC8BB" stroke-width="1.8" stroke-dasharray="3 2.6" stroke-linecap="round"></path><path d="M32 6 C35.5 6 37.5 11 39 16 C40.6 21.5 41.5 26 40.5 28 C39.5 29.6 36.6 29.8 32 29.8 C27.4 29.8 24.5 29.6 23.5 28 C22.5 26 23.4 21.5 25 16 C26.5 11 28.5 6 32 6 Z" fill="#F1ECE2" stroke="#0B0B0F" stroke-width="2"></path><path d="M32 6 Q31 3 33 1.6" fill="none" stroke="#F1ECE2" stroke-width="1.8" stroke-linecap="round"></path><circle cx="29.6" cy="17.5" r="2.4" fill="#0B0B0F"></circle><circle cx="34.6" cy="17.5" r="2.4" fill="#0B0B0F"></circle></svg>
+<span class="logo-word">Sketch2Design</span>
+</a>
+<nav class="nav" aria-label="Ana menü">
+<a href="Studio.dc.html" class="is-on" aria-current="page">Stüdyo</a>
+<a href="#">Tasarımlarım</a>
+<a href="#">Doğrula</a>
+</nav>
+<div class="wallet">
+<sc-if value="{{wIdle}}" hint-placeholder-val="{{ true }}"><button type="button" class="btn btn-outline" onClick="{{connect}}"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7.2 Q11 6.4 19.6 7 Q20.4 12 19.8 18.4 Q12 19.2 4.4 18.6 Q3.6 13 4 7.2 Z"></path><path d="M15.6 12.8 h1.6 M4.2 9.6 Q10 9.1 16.8 9.4 L16.6 5.2"></path></svg>Cüzdan Bağla</button></sc-if>
+<sc-if value="{{wConnecting}}" hint-placeholder-val="{{ false }}"><button type="button" class="btn btn-outline" disabled="" aria-busy="true"><span class="spin" aria-hidden="true"></span>Bağlanıyor…</button></sc-if>
+<sc-if value="{{wConnected}}" hint-placeholder-val="{{ false }}"><span class="net">Monad Testnet</span><button type="button" class="addr" onClick="{{disconnect}}" aria-label="Cüzdan bağlı: 0x3f8A…9a2C. Bağlantıyı kesmek için tıkla"><span class="dot-ok" aria-hidden="true"></span>0x3f8A…9a2C</button></sc-if>
+</div>
+</div>
+</header>
+
+<div class="container" style="position: relative">
+<div class="subbar">
+<label class="sr-only" for="s2d-title">Kroki adı</label>
+<input id="s2d-title" class="title-in" type="text" value="{{title}}" onChange="{{onTitle}}" maxlength="40">
+<span class="saved">{{savedTxt}}</span>
+<span class="fmt-now">{{fmtChip}}</span>
+</div>
+
+<div class="studio">
+<div class="toolbar" role="toolbar" aria-label="Çizim araçları">
+<button type="button" class="{{tPen}}" onClick="{{selPen}}" aria-pressed="{{pPen}}" aria-label="Kalem" data-tip="kalem"><svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 19.6 L5.6 15.2 L16.2 4.6 Q17.6 3.4 19 4.8 Q20.4 6.2 19.2 7.6 L8.6 18.3 Z"></path><path d="M14.2 6.6 L17.3 9.7"></path></svg></button>
+<button type="button" class="{{tRect}}" onClick="{{selRect}}" aria-pressed="{{pRect}}" aria-label="Dikdörtgen" data-tip="kutu"><svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4.6 5.6 Q12 5 19.4 5.8 Q19.9 12 19.2 18.4 Q12 19 4.8 18.2 Q4.2 12 4.6 5.6 Z"></path></svg></button>
+<button type="button" class="{{tEll}}" onClick="{{selEll}}" aria-pressed="{{pEll}}" aria-label="Daire" data-tip="daire"><svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12.4 4.2 C17.6 4.2 20.2 8 19.9 12.4 C19.6 17 16.4 20 11.8 19.8 C7 19.6 4 16.4 4.2 11.6 C4.4 7.4 7.4 4.4 13 4.6"></path></svg></button>
+<button type="button" class="{{tLine}}" onClick="{{selLine}}" aria-pressed="{{pLine}}" aria-label="Çizgi" data-tip="çizgi"><svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 19 Q11.5 12.8 19.2 4.8"></path></svg></button>
+<button type="button" class="{{tNote}}" onClick="{{selNote}}" aria-pressed="{{pNote}}" aria-label="Metin notu" data-tip="not"><svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5.2 6.2 Q12 5.6 18.8 6.1 M12.1 6 Q11.8 12.5 12.2 19.2 M9 19.2 Q12 18.9 15.2 19.3"></path></svg></button>
+<button type="button" class="{{tErase}}" onClick="{{selErase}}" aria-pressed="{{pErase}}" aria-label="Silgi" data-tip="silgi"><svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4.6 15.4 Q9 10.8 13.6 6.2 Q16.6 9 19.6 12.2 Q16 15.8 12.4 19.4 L8.4 19.4 Z"></path><path d="M9.6 10.6 Q12.4 13.4 15.4 16.4 M13.4 19.6 H20"></path></svg></button>
+<span class="tsep" aria-hidden="true"></span>
+<button type="button" class="tool" onClick="{{undo}}" disabled="{{noUndo}}" aria-label="Geri al" data-tip="geri al"><svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.2 14.2 Q6.6 11.6 4.2 9 Q6.8 6.6 9.4 4.2"></path><path d="M4.6 9.1 Q11 8.6 14.6 9.2 Q20.2 10.6 19.8 15.2 Q19.2 20.4 12.8 20.2"></path></svg></button>
+<button type="button" class="tool" onClick="{{redo}}" disabled="{{noRedo}}" aria-label="İleri al" data-tip="ileri al"><svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.8 14.2 Q17.4 11.6 19.8 9 Q17.2 6.6 14.6 4.2"></path><path d="M19.4 9.1 Q13 8.6 9.4 9.2 Q3.8 10.6 4.2 15.2 Q4.8 20.4 11.2 20.2"></path></svg></button>
+<button type="button" class="tool" onClick="{{clear}}" disabled="{{noClear}}" aria-label="Temizle" data-tip="hepsini sil"><svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4.4 7.2 Q12 6.6 19.6 7.3 M9.2 7 Q9 5 9.6 4.2 Q12 3.8 14.6 4.3 Q15 5.4 14.8 7 M6.4 7.6 Q7 13.6 7.6 19.6 Q12 20.2 16.6 19.6 Q17.2 13.6 17.6 7.6"></path></svg></button>
+<span class="tsep" aria-hidden="true"></span>
+<label class="tool upl" data-tip="fotoğraf yükle"><input type="file" accept="image/png,image/jpeg" class="sr-only" onChange="{{onFile}}"><svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12.1 15.8 Q11.8 10 12 4.4 M7.6 8.6 Q9.8 6.4 12 4.2 Q14.2 6.4 16.4 8.8"></path><path d="M4.4 15.6 Q4.2 18 4.6 19.8 Q12 20.3 19.4 19.7 Q19.8 17.6 19.6 15.4"></path></svg><span class="sr-only">Dosya yükle (PNG ya da JPG, kağıt fotoğrafı)</span></label>
+</div>
+
+<div class="stage-col">
+<div class="stage">
+<div class="{{paperCls}}" onPointerDown="{{down}}" onPointerMove="{{move}}" onPointerUp="{{up}}" onPointerCancel="{{up}}" role="img" aria-label="Çizim alanı">
+<span class="tape" aria-hidden="true" style="left: -18px; top: 6px; transform: rotate(-32deg)"></span>
+<span class="tape" aria-hidden="true" style="right: -18px; top: 6px; transform: rotate(30deg)"></span>
+<sc-if value="{{hasUpload}}" hint-placeholder-val="{{ false }}"><img class="upimg" src="{{upload}}" alt="Yüklenen kroki fotoğrafı"></sc-if>
+<sc-for list="{{strokes}}" as="it" hint-placeholder-count="0">
+<svg class="layer" viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-hidden="true"><path d="{{it.d}}"></path></svg>
+</sc-for>
+<sc-if value="{{hasDraft}}" hint-placeholder-val="{{ false }}"><svg class="layer draft" viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-hidden="true"><path d="{{draftD}}"></path></svg></sc-if>
+<sc-for list="{{notes}}" as="n" hint-placeholder-count="0">
+<span class="note" style="left: {{n.l}}%; top: {{n.t}}%">{{n.label}}</span>
+</sc-for>
+<sc-if value="{{isEmpty}}" hint-placeholder-val="{{ true }}">
+<div class="empty">
+<div class="hint">Kutular çiz, içine "buton", "başlık" gibi notlar yaz. Gerisini ben okurum.</div>
+<svg class="ch-svg ag-reader st-portrait st-curious" viewBox="0 0 240 250" width="116" height="121" role="img" aria-label="Okuyucu karakteri">
+<ellipse class="shadow" cx="120" cy="228" rx="64" ry="8"></ellipse>
+<g class="hop"><g class="squash">
+<path class="antenna" d="M120 46 Q112 30 124 19"></path>
+<circle class="tint ol" cx="127" cy="16" r="8"></circle>
+<path class="tint ol" d="M120 40 C146 40 160 72 174 110 C190 152 204 182 199 199 C195 212 178 215 120 215 C62 215 45 212 41 199 C36 182 50 152 66 110 C80 72 94 40 120 40 Z"></path>
+<path class="shade" d="M44 186 C60 200 90 204 120 204 C150 204 180 200 196 186 C201 196 198 204 190 208 C176 213 160 213 120 213 C80 213 64 213 50 208 C42 204 39 196 44 186 Z"></path>
+<path class="shine" d="M80 112 C86 88 96 68 108 56"></path>
+<circle class="white ol" cx="102" cy="118" r="18"></circle><circle class="pupil" cx="102" cy="116" r="8"></circle><circle class="glint" cx="105" cy="112.6" r="2.6"></circle>
+<circle class="white ol" cx="138" cy="118" r="18"></circle><circle class="pupil" cx="138" cy="116" r="8"></circle><circle class="glint" cx="141" cy="112.6" r="2.6"></circle>
+<path class="brow" d="M86 92 Q100 84 113 91"></path>
+<path class="brow" d="M127 91 Q140 84 154 92"></path>
+<path class="mouth m-fill" d="M114 151 a6 7 0 1 0 12 0 a6 7 0 1 0 -12 0"></path>
+<path d="M198 184 L220 210" stroke="#0B0B0F" stroke-width="13" stroke-linecap="round"></path><path d="M198 184 L220 210" stroke="#7A4A26" stroke-width="6" stroke-linecap="round"></path><circle cx="184" cy="166" r="23" fill="rgba(210,232,255,0.38)" stroke="#0B0B0F" stroke-width="6"></circle><circle cx="184" cy="166" r="17.5" fill="none" stroke="#DCE6F5" stroke-width="3"></circle><path d="M172 158 Q176 150 184 149" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round"></path>
+</g></g>
+</svg>
+<div class="empty-actions">
+<button type="button" class="btn btn-ink" onClick="{{sample}}">Örnek kroki koy</button>
+<label class="btn btn-ink-2 upl"><input type="file" accept="image/png,image/jpeg" class="sr-only" onChange="{{onFile}}">Kağıt fotoğrafı yükle</label>
+</div>
+</div>
+</sc-if>
+</div>
+</div>
+<div class="stage-foot">
+<div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap">
+<span>{{countTxt}}</span>
+<sc-if value="{{hasUpload}}" hint-placeholder-val="{{ false }}"><span class="upchip">{{upName}}<button type="button" class="x" onClick="{{removeUpload}}" aria-label="Yüklenen dosyayı kaldır"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M6.2 6.6 Q12 12.3 17.8 17.6 M17.5 6.3 Q12.2 11.8 6.4 17.9"></path></svg></button></span></sc-if>
+<sc-if value="{{hasUpErr}}" hint-placeholder-val="{{ false }}"><span class="err" role="alert">{{upErr}}</span></sc-if>
+</div>
+<label style="display: inline-flex; align-items: center; gap: 10px">Not yazarken
+<select class="sel" onChange="{{onNoteWord}}" value="{{noteWord}}">
+<option value="başlık">başlık</option><option value="buton">buton</option><option value="görsel">görsel</option><option value="metin">metin</option><option value="kart">kart</option><option value="menü">menü</option><option value="logo">logo</option>
+</select>
+</label>
+</div>
+</div>
+
+<aside class="panel" aria-label="Tasarım ayarları">
+<section class="psec fmt-sec">
+<h2 class="ptitle"><span class="pnum">1</span>Ne tasarlıyoruz?<span class="{{fmtNoteCls}}">{{fmtNote}}</span></h2>
+<div class="fmt-grid" role="radiogroup" aria-label="Tasarım tipi">
+<sc-for list="{{formats}}" as="f" hint-placeholder-count="5">
+<button type="button" role="radio" aria-checked="{{f.checked}}" class="{{f.cls}}" onClick="{{f.pick}}">
+<span class="fbox" aria-hidden="true"><span class="fshape" style="width: {{f.w}}px; height: {{f.h}}px"></span></span>
+<span style="display: flex; flex-direction: column; min-width: 0"><span style="font-size: 17px; font-weight: 600; line-height: 1.2">{{f.name}}</span><span class="mono" style="font-size: 15px; color: var(--muted)">{{f.ratio}}</span></span>
+</button>
+</sc-for>
+</div>
+</section>
+
+<section class="psec">
+<h2 class="ptitle"><span class="pnum">2</span>Hangi renkler?<span class="pnote">boş geçebilirsin</span></h2>
+<div class="pal-grid" role="radiogroup" aria-label="Renk paleti">
+<button type="button" role="radio" aria-checked="{{autoChecked}}" class="{{autoCls}}" onClick="{{pickAuto}}">
+<svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M12 3.6 Q12.6 9.4 18.4 11.8 Q12.6 13.6 12 19.8 Q11.2 13.6 5.4 12 Q11.2 10 12 3.6 Z"></path></svg>
+<span style="display: flex; flex-direction: column"><span style="font-size: 17px; font-weight: 600">Tasarımcı seçsin</span><span style="font-size: 15px; color: var(--muted)">krokiye bakıp karar verir</span></span>
+</button>
+<sc-for list="{{palettes}}" as="pl" hint-placeholder-count="6">
+<button type="button" role="radio" aria-checked="{{pl.checked}}" class="{{pl.cls}}" onClick="{{pl.pick}}">
+<span style="font-size: 16px; font-weight: 600">{{pl.name}}</span>
+<span class="sw" aria-hidden="true"><span style="background: {{pl.c0}}"></span><span style="background: {{pl.c1}}"></span><span style="background: {{pl.c2}}"></span><span style="background: {{pl.c3}}"></span></span>
+</button>
+</sc-for>
+</div>
+<div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
+<label style="display: inline-flex; align-items: center; gap: 10px; font-size: 16px; color: var(--text-2); cursor: pointer"><input class="color-in" type="color" value="#6E54FF" onChange="{{addColor}}">Kendi rengini ekle</label>
+<sc-for list="{{customs}}" as="cc" hint-placeholder-count="0">
+<span class="cchip"><span style="width: 16px; height: 16px; border-radius: 4px; background: {{cc.hex}}"></span>{{cc.hex}}<button type="button" class="x" onClick="{{cc.remove}}" aria-label="{{cc.aria}}"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M6.2 6.6 Q12 12.3 17.8 17.6 M17.5 6.3 Q12.2 11.8 6.4 17.9"></path></svg></button></span>
+</sc-for>
+</div>
+</section>
+
+<section class="psec">
+<h2 class="ptitle"><label for="s2d-desc" style="display: flex; align-items: baseline; gap: 12px; flex: 1 1 auto"><span class="pnum">3</span>Tek cümleyle anlat</label><span class="pnote">boş geçebilirsin</span></h2>
+<input id="s2d-desc" class="field" type="text" maxlength="80" placeholder="Kulüp etkinliği afişi" value="{{desc}}" onChange="{{onDesc}}">
+<span class="mono" style="font-size: 15px; color: var(--faint); align-self: flex-end">{{descCount}}/80</span>
+</section>
+
+<section class="psec go">
+<sc-if value="{{canGo}}" hint-placeholder-val="{{ false }}">
+<a class="btn btn-primary btn-xl" href="Scene.dc.html">Tasarla<svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.6 12.3 Q11 11.6 18.6 12.1 M13.8 7 Q16.6 9.6 19 12.1 Q16.4 14.6 13.9 17.2"></path></svg></a>
+</sc-if>
+<sc-if value="{{cannotGo}}" hint-placeholder-val="{{ true }}">
+<button type="button" class="btn btn-primary btn-xl" disabled="" aria-describedby="s2d-why">Tasarla</button>
+</sc-if>
+<span id="s2d-why" style="font-size: 16px; color: var(--muted)">{{goHint}}</span>
+</section>
+</aside>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"startFormat":{"editor":"enum","options":["none","poster","post","deck","web","mobile"],"default":"none"},"startWithSample":{"editor":"boolean","default":false},"walletStart":{"editor":"enum","options":["idle","connected"],"default":"idle"},"$preview":{"width":1440,"height":940}}'>
+var FORMATS = [
+  { id: 'poster', name: 'Afiş', ratio: '3:4', w: 27, h: 36 },
+  { id: 'post', name: 'Sosyal medya', ratio: '1:1', w: 32, h: 32 },
+  { id: 'deck', name: 'Sunum', ratio: '16:9', w: 42, h: 24 },
+  { id: 'web', name: 'Web sitesi', ratio: 'masaüstü', w: 40, h: 25 },
+  { id: 'mobile', name: 'Mobil uygulama', ratio: '9:19.5', w: 17, h: 36 }
+];
+var PALETTES = [
+  { id: 'monad', name: 'Monad', c: ['#6E54FF', '#FFB84D', '#17162A', '#FFFDF8'] },
+  { id: 'night', name: 'Gece', c: ['#0F172A', '#38BDF8', '#F472B6', '#E2E8F0'] },
+  { id: 'campus', name: 'Kampüs', c: ['#1D4ED8', '#F59E0B', '#FFFFFF', '#111827'] },
+  { id: 'nature', name: 'Doğa', c: ['#166534', '#A3E635', '#FEF9C3', '#1C1917'] },
+  { id: 'sunset', name: 'Gün batımı', c: ['#9A3412', '#FB923C', '#FDE68A', '#1F1A17'] },
+  { id: 'mono', name: 'Mono', c: ['#111111', '#555555', '#DDDDDD', '#FFFFFF'] }
+];
+var uid = 1;
+function r1(n) { return Math.round(n * 10) / 10; }
+function ptsToD(pts) { return 'M' + pts.map(function (p) { return r1(p[0]) + ' ' + r1(p[1]); }).join(' L'); }
+function mkRect(a, b) {
+  var x1 = r1(Math.min(a[0], b[0])), x2 = r1(Math.max(a[0], b[0])), y1 = r1(Math.min(a[1], b[1])), y2 = r1(Math.max(a[1], b[1]));
+  var pts = [];
+  for (var i = 0; i <= 12; i++) { var t = i / 12; pts.push([x1 + (x2 - x1) * t, y1], [x1 + (x2 - x1) * t, y2], [x1, y1 + (y2 - y1) * t], [x2, y1 + (y2 - y1) * t]); }
+  return { id: uid++, type: 'rect', d: 'M' + x1 + ' ' + y1 + ' H' + x2 + ' V' + y2 + ' H' + x1 + ' Z', pts: pts, size: Math.max(x2 - x1, y2 - y1) };
+}
+function mkEll(a, b) {
+  var cx = (a[0] + b[0]) / 2, cy = (a[1] + b[1]) / 2, rx = Math.abs(b[0] - a[0]) / 2, ry = Math.abs(b[1] - a[1]) / 2;
+  var pts = [];
+  for (var i = 0; i < 28; i++) { var t = i / 28 * Math.PI * 2; pts.push([cx + rx * Math.cos(t), cy + ry * Math.sin(t)]); }
+  return { id: uid++, type: 'ell', d: 'M' + r1(cx - rx) + ' ' + r1(cy) + ' a' + r1(rx) + ' ' + r1(ry) + ' 0 1 0 ' + r1(2 * rx) + ' 0 a' + r1(rx) + ' ' + r1(ry) + ' 0 1 0 ' + r1(-2 * rx) + ' 0', pts: pts, size: Math.max(rx, ry) * 2 };
+}
+function mkLine(a, b) {
+  var pts = [];
+  for (var i = 0; i <= 12; i++) { var t = i / 12; pts.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]); }
+  return { id: uid++, type: 'line', d: 'M' + r1(a[0]) + ' ' + r1(a[1]) + ' L' + r1(b[0]) + ' ' + r1(b[1]), pts: pts, size: Math.hypot(b[0] - a[0], b[1] - a[1]) };
+}
+function mkPen(pts) { return { id: uid++, type: 'pen', d: ptsToD(pts), pts: pts, size: pts.length * 4 }; }
+function mkNote(x, y, label) { return { id: uid++, type: 'note', x: x, y: y, label: label, pts: [[x + 20, y]] }; }
+function zig(x0, x1, y, amp, step) { var pts = [], up = true; for (var x = x0; x <= x1; x += step) { pts.push([x, y + (up ? -amp : amp)]); up = !up; } return pts; }
+function sampleItems() {
+  return [
+    mkRect([60, 30], [960, 110]), mkEll([82, 46], [148, 94]),
+    mkPen(zig(70, 700, 178, 12, 26)), mkPen(zig(70, 520, 228, 12, 26)), mkLine([70, 276], [620, 282]),
+    mkRect([60, 320], [960, 600]), mkLine([68, 328], [952, 592]), mkLine([952, 328], [68, 592]),
+    mkRect([60, 640], [400, 720]),
+    mkRect([60, 760], [340, 940]), mkRect([370, 760], [650, 940]), mkRect([680, 760], [960, 940]),
+    mkNote(740, 70, 'menü'), mkNote(730, 190, 'başlık'), mkNote(440, 460, 'görsel'), mkNote(420, 680, 'buton'), mkNote(80, 800, 'kart')
+  ];
+}
+function draftItem(d) {
+  if (!d) return null;
+  if (d.type === 'pen') return mkPen(d.pts);
+  if (d.type === 'rect') return mkRect(d.a, d.b);
+  if (d.type === 'ell') return mkEll(d.a, d.b);
+  if (d.type === 'line') return mkLine(d.a, d.b);
+  return null;
+}
+
+class Component extends DCLogic {
+  componentWillUnmount() { if (this.tm) clearTimeout(this.tm); }
+  getItems() {
+    var st = this.state || {};
+    if (st.items) return st.items;
+    if (this.props.startWithSample) { if (!this.seed) this.seed = sampleItems(); return this.seed; }
+    return [];
+  }
+  norm(e) {
+    var r = e.currentTarget.getBoundingClientRect();
+    return [Math.max(0, Math.min(1000, (e.clientX - r.left) / r.width * 1000)), Math.max(0, Math.min(1000, (e.clientY - r.top) / r.height * 1000))];
+  }
+  commitItems(items) { var st = this.state || {}; var hist = (st.hist || []).concat([this.getItems()]); this.setState({ items: items, hist: hist.slice(-50), fut: [], saved: Date.now() }); }
+  eraseAt(p) {
+    var items = this.getItems();
+    var keep = items.filter(function (it) { return !it.pts.some(function (q) { return Math.hypot(q[0] - p[0], q[1] - p[1]) < 24; }); });
+    if (keep.length !== items.length) this.commitItems(keep);
+  }
+  onDown(e) {
+    if (e.target && e.target.closest && e.target.closest('button, label, input, a, select')) return;
+    var tool = (this.state || {}).tool || 'pen';
+    var p = this.norm(e);
+    if (e.currentTarget.setPointerCapture) { try { e.currentTarget.setPointerCapture(e.pointerId); } catch (err) {} }
+    if (tool === 'note') { var w = (this.state || {}).noteWord || 'buton'; this.commitItems(this.getItems().concat([mkNote(p[0], p[1], w)])); return; }
+    if (tool === 'eraser') { this.erasing = true; this.eraseAt(p); return; }
+    if (tool === 'pen') this.draft = { type: 'pen', pts: [p] };
+    else this.draft = { type: tool, a: p, b: p };
+    this.setState({ tick: Date.now() });
+  }
+  onMove(e) {
+    if (this.erasing) { this.eraseAt(this.norm(e)); return; }
+    if (!this.draft) return;
+    var p = this.norm(e);
+    if (this.draft.type === 'pen') {
+      var last = this.draft.pts[this.draft.pts.length - 1];
+      if (Math.hypot(p[0] - last[0], p[1] - last[1]) < 4) return;
+      this.draft.pts.push(p);
+    } else { this.draft.b = p; }
+    this.setState({ tick: Date.now() });
+  }
+  onUp() {
+    this.erasing = false;
+    if (!this.draft) return;
+    var it = draftItem(this.draft);
+    this.draft = null;
+    if (it && it.size > 8) this.commitItems(this.getItems().concat([it]));
+    else this.setState({ tick: Date.now() });
+  }
+  renderVals() {
+    var self = this;
+    var st = this.state || {};
+    var tool = st.tool || 'pen';
+    var items = this.getItems();
+    var fmt = st.format !== undefined ? st.format : (this.props.startFormat && this.props.startFormat !== 'none' ? this.props.startFormat : null);
+    var pal = st.palette || 'auto';
+    var customs = st.customs || [];
+    var w = st.wallet || this.props.walletStart || 'idle';
+    var F = null; FORMATS.forEach(function (f) { if (f.id === fmt) F = f; });
+    var strokes = items.filter(function (i) { return i.type !== 'note'; });
+    var notes = items.filter(function (i) { return i.type === 'note'; }).map(function (n) { return { label: n.label, l: r1(n.x / 10), t: r1(n.y / 10) }; });
+    var d = draftItem(this.draft);
+    var hasContent = items.length > 0 || !!st.upload;
+    var canGo = !!fmt && hasContent;
+    var missing = [];
+    if (!fmt) missing.push('ne tasarladığımızı seç');
+    if (!hasContent) missing.push('bir şey çiz ya da fotoğraf yükle');
+    function toolCls(id) { return 'tool' + (tool === id ? ' is-on' : ''); }
+    function sel(id) { return function () { self.setState({ tool: id }); }; }
+    var hist = st.hist || [], fut = st.fut || [];
+    return {
+      wIdle: w === 'idle', wConnecting: w === 'connecting', wConnected: w === 'connected',
+      connect: function () { self.setState({ wallet: 'connecting' }); self.tm = setTimeout(function () { self.setState({ wallet: 'connected' }); }, 900); },
+      disconnect: function () { self.setState({ wallet: 'idle' }); },
+      title: st.title !== undefined ? st.title : 'Adsız kroki',
+      onTitle: function (e) { self.setState({ title: e.target.value }); },
+      savedTxt: st.saved ? 'taslak kaydedildi' : 'henüz kaydedilmedi',
+      fmtChip: F ? F.name + ' · ' + F.ratio : 'format seçilmedi',
+      tPen: toolCls('pen'), tRect: toolCls('rect'), tEll: toolCls('ell'), tLine: toolCls('line'), tNote: toolCls('note'), tErase: toolCls('eraser'),
+      pPen: String(tool === 'pen'), pRect: String(tool === 'rect'), pEll: String(tool === 'ell'), pLine: String(tool === 'line'), pNote: String(tool === 'note'), pErase: String(tool === 'eraser'),
+      selPen: sel('pen'), selRect: sel('rect'), selEll: sel('ell'), selLine: sel('line'), selNote: sel('note'), selErase: sel('eraser'),
+      noUndo: hist.length === 0, noRedo: fut.length === 0, noClear: !hasContent,
+      undo: function () { if (!hist.length) return; var prev = hist[hist.length - 1]; self.setState({ items: prev, hist: hist.slice(0, -1), fut: fut.concat([items]) }); },
+      redo: function () { if (!fut.length) return; var nxt = fut[fut.length - 1]; self.setState({ items: nxt, fut: fut.slice(0, -1), hist: hist.concat([items]) }); },
+      clear: function () { self.setState({ items: [], hist: hist.concat([items]), fut: [], upload: null, upName: null }); },
+      sample: function () { self.commitItems(sampleItems()); },
+      onFile: function (e) {
+        var f = e.target.files && e.target.files[0];
+        if (!f) return;
+        if (!/^image\/(png|jpe?g)$/.test(f.type)) { self.setState({ upErr: 'Bunu okuyamam. PNG ya da JPG ver.' }); return; }
+        self.setState({ upload: URL.createObjectURL(f), upName: f.name, upErr: null, saved: Date.now() });
+      },
+      removeUpload: function () { self.setState({ upload: null, upName: null }); },
+      hasUpload: !!st.upload, upload: st.upload || '', upName: st.upName || '',
+      hasUpErr: !!st.upErr, upErr: st.upErr || '',
+      paperCls: 'paper fmt-' + (fmt || 'poster') + ' t-' + tool,
+      down: function (e) { self.onDown(e); }, move: function (e) { self.onMove(e); }, up: function () { self.onUp(); },
+      strokes: strokes, notes: notes,
+      hasDraft: !!d, draftD: d ? d.d : 'M0 0',
+      isEmpty: !hasContent && !d,
+      countTxt: hasContent ? (strokes.length + ' çizim, ' + notes.length + ' not') : 'Kağıt boş',
+      noteWord: st.noteWord || 'buton',
+      onNoteWord: function (e) { self.setState({ noteWord: e.target.value, tool: 'note' }); },
+      formats: FORMATS.map(function (f, i) {
+        return Object.assign({}, f, {
+          checked: String(f.id === fmt), cls: 'fcard' + (f.id === fmt ? ' is-on' : '') + (i === 4 ? ' span2' : ''),
+          pick: function () { self.setState({ format: f.id }); }
+        });
+      }),
+      fmtNote: fmt ? 'tamam' : 'bunu seçmen lazım', fmtNoteCls: 'pnote ' + (fmt ? 'ok' : 'req'),
+      autoChecked: String(pal === 'auto'), autoCls: 'pal wide' + (pal === 'auto' ? ' is-on' : ''),
+      pickAuto: function () { self.setState({ palette: 'auto' }); },
+      palettes: PALETTES.map(function (p) {
+        return { name: p.name, c0: p.c[0], c1: p.c[1], c2: p.c[2], c3: p.c[3], checked: String(pal === p.id), cls: 'pal' + (pal === p.id ? ' is-on' : ''), pick: function () { self.setState({ palette: p.id }); } };
+      }),
+      customs: customs.map(function (hex) { return { hex: hex, aria: hex + ' rengini kaldır', remove: function () { self.setState({ customs: customs.filter(function (x) { return x !== hex; }) }); } }; }),
+      addColor: function (e) { var hex = (e.target.value || '').toUpperCase(); if (!hex || customs.indexOf(hex) >= 0) return; self.setState({ customs: customs.concat([hex]).slice(-4) }); },
+      desc: st.desc || '', descCount: (st.desc || '').length,
+      onDesc: function (e) { self.setState({ desc: e.target.value }); },
+      canGo: canGo, cannotGo: !canGo,
+      goHint: canGo ? 'Beş kişilik ekip hazır, yaklaşık 40 saniye sürer.' : 'Önce ' + missing.join(', sonra ') + '.'
+    };
+  }
+}
+</script>
+</body>
+</html>

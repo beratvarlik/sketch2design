@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Çıkış tasarımı</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&amp;family=Geist:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="position: relative; width: 300px; height: 520px; overflow: hidden; box-sizing: border-box; padding: 18px; background: {{bg}}; font-family: 'Geist', system-ui, sans-serif; color: #17162A; line-height: 1.2; transition: background .5s ease">
+
+<div aria-hidden="true" style="position: absolute; inset: 0; padding: 0 18px; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 6px; opacity: {{gridOp}}; transition: opacity .5s ease; pointer-events: none">
+<span style="background: rgba(255,138,61,0.16)"></span><span style="background: rgba(255,138,61,0.16)"></span><span style="background: rgba(255,138,61,0.16)"></span><span style="background: rgba(255,138,61,0.16)"></span><span style="background: rgba(255,138,61,0.16)"></span><span style="background: rgba(255,138,61,0.16)"></span><span style="background: rgba(255,138,61,0.16)"></span><span style="background: rgba(255,138,61,0.16)"></span><span style="background: rgba(255,138,61,0.16)"></span><span style="background: rgba(255,138,61,0.16)"></span><span style="background: rgba(255,138,61,0.16)"></span><span style="background: rgba(255,138,61,0.16)"></span>
+</div>
+
+<div style="position: relative; display: flex; flex-direction: column; gap: 12px; opacity: {{show}}; transition: opacity .5s ease">
+<div style="display: flex; align-items: center; gap: 8px; height: 22px">
+<span style="width: 20px; height: 20px; border-radius: 50%; box-sizing: border-box; background: {{primary}}; border: {{bord}}; transition: all .5s ease"></span>
+<span style="font-size: 13px; font-weight: 700; color: {{tc}}; background: {{tb}}; border-radius: 4px; transition: all .5s ease">Sketch2Design</span>
+<span style="margin-left: auto; display: flex; gap: 10px; font-size: 11px; color: {{sc}}; transition: all .5s ease"><span style="background: {{tb}}; border-radius: 3px">Ürün</span><span style="background: {{tb}}; border-radius: 3px">Fiyat</span><span style="background: {{tb}}; border-radius: 3px">Giriş</span></span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px; margin-top: 6px; transform: {{tTitle}}; transform-origin: 0 0; transition: transform .6s ease">
+<span style="align-self: flex-start; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 30px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.05; color: {{tc}}; background: {{tb}}; border-radius: 6px; transition: all .5s ease">Fikrini çiz,</span>
+<span style="align-self: flex-start; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 30px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.05; color: {{tc}}; background: {{tb}}; border-radius: 6px; transition: all .5s ease">tasarımı al.</span>
+</div>
+<span style="align-self: flex-start; font-size: 13px; color: {{sc}}; background: {{tb}}; border-radius: 4px; transition: all .5s ease">Krokiden canlı tasarıma, saniyeler içinde.</span>
+<div style="position: relative; height: {{imgH}}; border-radius: 14px; box-sizing: border-box; background: {{imgBg}}; border: {{bord}}; overflow: hidden; transition: all .6s ease">
+<svg aria-hidden="true" width="264" height="132" viewBox="0 0 264 132" style="position: absolute; left: 0; top: 0; opacity: {{illOp}}; transition: opacity .5s ease"><path d="M34 96 Q60 40 96 70 T150 52" fill="none" stroke="#FFFDF8" stroke-width="5" stroke-linecap="round"></path><rect x="164" y="28" width="66" height="76" rx="10" fill="#FFFDF8"></rect><rect x="174" y="40" width="46" height="8" rx="4" fill="#6E54FF"></rect><rect x="174" y="54" width="32" height="6" rx="3" fill="#C9C2FF"></rect><rect x="174" y="80" width="28" height="14" rx="5" fill="#FFB84D"></rect><circle cx="152" cy="52" r="7" fill="#FFB84D"></circle></svg>
+</div>
+<span style="align-self: flex-start; display: inline-flex; align-items: center; height: 40px; padding: 0 18px; border-radius: 12px; box-sizing: border-box; font-size: 14px; font-weight: 700; background: {{btnBg}}; color: {{btnTxt}}; border: {{bord}}; transform: {{tBtn}}; transition: all .6s ease">Hemen dene →</span>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+<div style="display: flex; flex-direction: column; gap: 6px; padding: 10px; border-radius: 12px; box-sizing: border-box; background: {{cardBg}}; border: {{bord}}; transition: all .5s ease"><span style="width: 22px; height: 22px; border-radius: 6px; box-sizing: border-box; background: {{ic1}}; border: {{bord}}"></span><span style="align-self: flex-start; font-size: 13px; font-weight: 700; color: {{tc}}; background: {{tb}}; border-radius: 3px">Çiz</span><span style="align-self: flex-start; font-size: 10.5px; color: {{sc}}; background: {{tb}}; border-radius: 3px">Kağıda ya da ekrana</span></div>
+<div style="display: flex; flex-direction: column; gap: 6px; padding: 10px; border-radius: 12px; box-sizing: border-box; background: {{cardBg}}; border: {{bord}}; transform: {{tCard}}; transition: all .5s ease"><span style="width: 22px; height: 22px; border-radius: 6px; box-sizing: border-box; background: {{ic2}}; border: {{bord}}"></span><span style="align-self: flex-start; font-size: 13px; font-weight: 700; color: {{tc}}; background: {{tb}}; border-radius: 3px">Üret</span><span style="align-self: flex-start; font-size: 10.5px; color: {{sc}}; background: {{tb}}; border-radius: 3px">Agent'lar tasarlar</span></div>
+<div style="display: flex; flex-direction: column; gap: 6px; padding: 10px; border-radius: 12px; box-sizing: border-box; background: {{cardBg}}; border: {{bord}}; transition: all .5s ease"><span style="width: 22px; height: 22px; border-radius: 6px; box-sizing: border-box; background: {{ic3}}; border: {{bord}}"></span><span style="align-self: flex-start; font-size: 13px; font-weight: 700; color: {{tc}}; background: {{tb}}; border-radius: 3px">Mühürle</span><span style="align-self: flex-start; font-size: 10.5px; color: {{sc}}; background: {{tb}}; border-radius: 3px">Monad'da kanıt</span></div>
+</div>
+<span style="align-self: flex-start; font-size: 10px; color: {{sc}}; background: {{tb}}; border-radius: 3px">© Sketch2Design</span>
+</div>
+
+<sc-if value="{{isEmpty}}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; inset: 14px; border: 2px dashed #3A3E49; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; color: #A3A9B5; font-size: 18px; text-align: center">
+<svg aria-hidden="true" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#6F7584" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"></rect><path d="M3 9h18M9 21V9"></path></svg>
+<span>Tasarım bekleniyor</span>
+</div>
+</sc-if>
+
+<sc-if value="{{sealed}}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; right: 12px; top: 12px; display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; background: #0E2F2E; color: #9FF5EF; border: 2px solid #2DD4CF; font-size: 12px; font-weight: 700; box-shadow: 0 6px 18px -6px #2DD4CF">
+<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"><path d="M12 2.5l8.2 4.75v9.5L12 21.5l-8.2-4.75v-9.5z"></path><path d="M8 12l2.8 2.8L16.5 9" stroke-linecap="round"></path></svg>Mühürlendi
+</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"level":{"editor":"int","default":6,"min":0,"max":7},"$preview":{"width":300,"height":520}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var L = Number(this.props.level ?? 6);
+    if (isNaN(L)) L = 6;
+    var wire = L <= 1, skeleton = L <= 2;
+    var primary = '#6E54FF';
+    var tc = skeleton ? 'transparent' : (L === 4 ? '#ABA6C6' : (L === 5 ? '#8F8AAE' : '#17162A'));
+    var sc = skeleton ? 'transparent' : (L === 4 ? '#C6C2D8' : (L === 5 ? '#AEAAC4' : '#4A4760'));
+    var btnBg = wire ? 'transparent' : (L === 4 ? '#C7BEFF' : (L === 5 ? '#ADA0FF' : primary));
+    return {
+      isEmpty: L === 0,
+      sealed: L >= 7,
+      bg: L === 0 ? '#16181E' : '#FFFDF8',
+      show: L === 0 ? 0 : 1,
+      gridOp: L === 1 ? 1 : (L === 2 ? 0.7 : (L === 3 ? 0.45 : 0)),
+      bord: wire ? '2px dashed #C9C4B8' : '2px solid transparent',
+      tb: L === 1 ? '#E4E0D6' : (L === 2 ? '#E8E4F4' : 'transparent'),
+      tc: tc, sc: sc,
+      primary: wire ? 'transparent' : primary,
+      imgBg: wire ? 'transparent' : primary,
+      imgH: L === 4 ? '96px' : '132px',
+      illOp: L >= 3 ? 1 : 0,
+      btnBg: btnBg,
+      btnTxt: skeleton ? 'transparent' : '#FFFFFF',
+      cardBg: wire ? 'transparent' : '#F1EEFF',
+      ic1: wire ? 'transparent' : '#FFB84D',
+      ic2: wire ? 'transparent' : primary,
+      ic3: wire ? 'transparent' : '#17162A',
+      tTitle: L === 4 ? 'translate(16px, 6px) rotate(-1.5deg)' : 'none',
+      tBtn: L === 4 ? 'translateX(92px)' : 'none',
+      tCard: L === 4 ? 'translateY(10px)' : 'none'
+    };
+  }
+}
+</script>
+</body>
+</html>

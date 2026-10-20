@@ -1,0 +1,878 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Sketch2Design — Agent sahnesi</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&amp;family=Caveat:wght@500;700&amp;family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#14120F}
+a{color:#A898FF}a:hover{color:#C9BEFF}
+.s2d{
+  --bg:#14120F;--surface:#1E1B17;--surface-2:#26221D;--line:rgba(241,236,226,.10);--line-strong:rgba(241,236,226,.22);
+  --text:#F1ECE2;--text-2:#CFC8BB;--muted:#A39B8D;--faint:#8A8275;--chalk:#CFC8BB;--paper:#F3EEE3;--pencil:#2B2925;
+  --accent:#6E54FF;--accent-hover:#7F68FF;--accent-text:#A898FF;--focus:#C9BEFF;
+  --success:#3FBF6E;--success-text:#86DDA6;--danger:#E5484D;--danger-text:#FF9A94;--warn:#E8A21A;
+  --c-reader:#4C8DFF;--c-designer:#FF8A3D;--c-generator:#9B6BFF;--c-critic:#FF4D5E;--c-notary:#2DD4CF;--ink:#0B0B0F;
+  --hand:'Caveat',cursive;--display:'Bricolage Grotesque',system-ui,sans-serif;--mono:'Geist Mono',ui-monospace,monospace;
+}
+.ag-reader{--agent-color:var(--c-reader)}.ag-designer{--agent-color:var(--c-designer)}.ag-generator{--agent-color:var(--c-generator)}.ag-critic{--agent-color:var(--c-critic)}.ag-notary{--agent-color:var(--c-notary)}
+.disp{font-family:var(--display)}.mono{font-family:var(--mono)}.hand{font-family:var(--hand)}
+.gridpaper{position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(241,236,226,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(241,236,226,.055) 1px,transparent 1px);background-size:28px 28px;-webkit-mask-image:linear-gradient(90deg,#000 0%,rgba(0,0,0,.55) 22%,transparent 52%);mask-image:linear-gradient(90deg,#000 0%,rgba(0,0,0,.55) 22%,transparent 52%)}
+
+/* karakter şablonu */
+.ch-svg{--fill:var(--agent-color);overflow:visible;display:block}
+.ch-svg.st-waiting{--fill:color-mix(in srgb,var(--agent-color) 34%,#3E3A33)}
+.ch-svg .ol{stroke:var(--ink);stroke-width:5;stroke-linejoin:round}
+.ch-svg .tint{fill:var(--fill);transition:fill .4s ease}
+.ch-svg .white{fill:#fff;stroke-width:4}
+.ch-svg .pupil{fill:var(--ink)}.ch-svg .glint{fill:#fff}.ch-svg .lid{stroke-width:4}
+.ch-svg .happy path{fill:none;stroke:var(--ink);stroke-width:5.5;stroke-linecap:round}
+.ch-svg .brow{fill:none;stroke:var(--ink);stroke-width:5;stroke-linecap:round}
+.ch-svg .mouth{stroke:var(--ink);stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+.ch-svg .m-line{fill:none}.ch-svg .m-fill{fill:#3A0F1A}
+.ch-svg .tongue{fill:#FF7A9C;stroke:var(--ink);stroke-width:3.5;stroke-linejoin:round}
+.ch-svg .cheeks ellipse{fill:rgba(255,255,255,.32)}
+.ch-svg .shadow{fill:#000;opacity:.5}
+.ch-svg .antenna{fill:none;stroke:var(--ink);stroke-width:5;stroke-linecap:round}
+.ch-svg .shade{fill:rgba(0,0,0,.16)}
+.ch-svg .shine{fill:none;stroke:rgba(255,255,255,.45);stroke-width:6;stroke-linecap:round}
+.ch-svg .is-hidden{display:none}
+.ch-svg .acc,.ch-svg .particles,.ch-svg .badge{display:none}
+.ag-reader .acc-reader,.ag-designer .acc-designer,.ag-generator .acc-generator,.ag-critic .acc-critic,.ag-notary .acc-notary,.ag-reader.st-asking .acc-qbubble{display:inline}
+.st-waiting .acc{opacity:.55}
+.st-working .particles{display:inline}
+.st-done .badge-done,.st-error .badge-retry{display:inline}
+.pt{fill:var(--agent-color)}.pt-w{fill:#fff}.spark{fill:none;stroke:var(--agent-color);stroke-width:3.5;stroke-linecap:round}
+.hop,.squash{transform-box:fill-box;transform-origin:50% 100%}
+.shadow,.eye,.gear,.pt{transform-box:fill-box;transform-origin:50% 50%}
+.eye{transition:transform .25s ease}
+.st-portrait .squash{animation:breathe 3.6s ease-in-out infinite}
+.st-waiting .squash{animation:breathe 3.2s ease-in-out infinite}
+.st-working .hop{animation:hopY .9s ease-in-out infinite}
+.st-working .squash{animation:hopSquash .9s ease-in-out infinite}
+.st-working .shadow{animation:shadowHop .9s ease-in-out infinite}
+.st-working .gear{animation:spin 3s linear infinite}
+.st-working .p1{animation:floatUp 1.6s ease-out infinite}
+.st-working .p2{animation:floatUp 1.6s ease-out .4s infinite}
+.st-working .p3{animation:floatUp 1.6s ease-out .8s infinite}
+.st-working .p4{animation:floatUp 1.6s ease-out 1.2s infinite}
+.st-asking .hop{animation:hopHigh .62s ease-in-out infinite}
+.st-asking .squash{animation:hopSquash .62s ease-in-out infinite}
+.st-asking .shadow{animation:shadowHop .62s ease-in-out infinite}
+.st-asking .eye{transform:scale(1.18)}
+.st-done .squash{animation:proud 2.4s ease-in-out infinite}
+.st-error .hop{animation:wobble 1.8s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(1,1)}50%{transform:scale(.982,1.035)}}
+@keyframes hopY{0%,15%,85%,100%{transform:translateY(0)}50%{transform:translateY(-16px)}}
+@keyframes hopHigh{0%,12%,88%,100%{transform:translateY(0)}50%{transform:translateY(-26px)}}
+@keyframes hopSquash{0%{transform:scale(1.08,.92)}15%{transform:scale(.94,1.07)}50%{transform:scale(.98,1.03)}80%{transform:scale(1,1)}90%{transform:scale(1.1,.9)}100%{transform:scale(1.08,.92)}}
+@keyframes shadowHop{0%,15%,85%,100%{transform:scale(1);opacity:.5}50%{transform:scale(.72);opacity:.22}}
+@keyframes proud{0%,100%{transform:scale(1,1)}50%{transform:scale(1.02,.98)}}
+@keyframes wobble{0%,70%,100%{transform:rotate(0)}12%{transform:rotate(-6deg)}26%{transform:rotate(5deg)}40%{transform:rotate(-3.5deg)}54%{transform:rotate(2deg)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes floatUp{0%{opacity:0;transform:translateY(8px) scale(.6)}30%{opacity:1}100%{opacity:0;transform:translateY(-22px) scale(1.05)}}
+
+/* butonlar */
+.btn{appearance:none;font:inherit;cursor:pointer;border:0;display:inline-flex;align-items:center;justify-content:center;gap:10px;border-radius:12px;transition:transform .15s ease,background .2s ease;white-space:nowrap}
+.btn:hover{transform:translateY(-1px)}
+.btn:focus-visible,.slot:focus-visible,.opt:focus-visible,.tab:focus-visible,.x:focus-visible,.jtab:focus-visible,.skip:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-hover)}
+.btn-ghost{background:transparent;color:var(--text-2)}
+.btn-ghost:hover{background:var(--surface);color:var(--text)}
+
+/* sahne */
+.slot{appearance:none;background:none;border:0;color:inherit;font:inherit;cursor:pointer;padding:0;position:relative;display:flex;flex-direction:column;align-items:center;border-radius:18px}
+.slot:hover .slot-name{text-decoration:underline;text-decoration-style:wavy;text-decoration-thickness:1.5px;text-underline-offset:6px}
+.spot{position:absolute;top:150px;left:50%;width:170px;height:140px;margin-left:-85px;border-radius:50%;background:var(--agent-color);filter:blur(50px);opacity:0;transition:opacity .4s ease;pointer-events:none}
+.slot.is-working .spot{opacity:.34}
+.bz{position:relative;height:120px;width:100%}
+.bubble{position:absolute;bottom:14px;left:50%;transform:translateX(-50%) rotate(-1.2deg);max-width:268px;width:max-content;box-sizing:border-box;padding:9px 16px 11px;background:var(--paper);color:#1A1814;font-family:var(--hand);font-weight:600;font-size:28px;line-height:1.02;text-align:left;border-radius:18px 24px 20px 15px / 15px 20px 24px 18px;box-shadow:0 10px 24px -14px #000;z-index:6;animation:bubIn .25s ease-out}
+.bubble::after{content:'';position:absolute;bottom:-11px;left:50%;margin-left:-9px;border-left:9px solid transparent;border-right:7px solid transparent;border-top:13px solid var(--paper)}
+.bz.al-l .bubble{left:4px;transform:rotate(-1.2deg)}
+.bz.al-l .bubble::after{left:102px}
+.bz.al-r .bubble{left:auto;right:4px;transform:rotate(1deg)}
+.bz.al-r .bubble::after{left:auto;right:94px}
+.b-ask{animation:askBob 1.1s ease-in-out infinite}
+.b-err{background:#F6E2D6}.b-err::after{border-top-color:#F6E2D6}
+.steps{display:inline-flex;gap:5px;margin-left:8px;vertical-align:middle}
+.steps i{width:8px;height:8px;border-radius:50%;border:1.6px solid #1A1814;box-sizing:border-box}
+.steps i.done,.steps i.active{background:#1A1814}
+.steps i.active{animation:dotPulse 1s ease-in-out infinite}
+@keyframes dotPulse{50%{transform:scale(1.35)}}
+@keyframes askBob{0%,100%{margin-bottom:0}50%{margin-bottom:6px}}
+@keyframes bubIn{from{opacity:0;margin-bottom:-8px}}
+.st-txt{font-size:17px;color:var(--muted)}
+.st-txt.on{color:var(--text)}
+.st-txt.ok{color:var(--success-text)}
+.st-txt.bad{color:var(--danger-text)}
+.spec{position:absolute;top:0;width:168px;box-sizing:border-box;padding:8px 12px 9px;border-radius:6px;background:var(--surface-2);border:1px solid var(--line-strong);transition:left .7s cubic-bezier(.6,0,.2,1),opacity .3s ease,transform .3s ease;display:flex;flex-direction:column;gap:2px}
+.spec.ret{transform:rotate(-3deg);border-color:var(--danger)}
+.spec.off{opacity:0}
+.loop .main{fill:none;stroke:rgba(241,236,226,.22);stroke-width:3;stroke-linecap:round}
+.loop .head{fill:none;stroke:rgba(241,236,226,.22);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.loop.on .main,.loop.on .head{stroke:var(--chalk)}
+.loop.hot .main{stroke-dasharray:10 9;animation:dash .5s linear infinite}
+.loop-lbl{opacity:.35;transition:opacity .3s ease}
+.loop.on .loop-lbl{opacity:1}
+@keyframes dash{to{stroke-dashoffset:-38}}
+.sc{font-family:var(--mono);font-weight:500;font-size:24px;color:var(--faint)}
+.sc.fail{color:var(--danger-text);text-decoration:line-through;text-decoration-thickness:2px}
+.sc.pass{color:var(--success-text)}
+.sc.cur{font-size:30px;font-weight:600}
+.jtab{appearance:none;cursor:pointer;position:absolute;right:0;top:420px;width:44px;height:200px;border:0;border-radius:12px 0 0 12px;background:var(--surface);color:var(--text-2);font:inherit;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;z-index:35;border-left:1px solid var(--line)}
+.jtab:hover{color:var(--text);background:var(--surface-2)}
+.jtab span{writing-mode:vertical-rl;transform:rotate(180deg);font-family:var(--mono);font-size:16px}
+.drawer{position:absolute;top:96px;right:0;bottom:170px;width:460px;box-sizing:border-box;padding:22px 28px 22px 26px;background:var(--surface);border-left:1px solid var(--line);transform:translateX(105%);transition:transform .4s cubic-bezier(.2,.8,.2,1);z-index:34;display:flex;flex-direction:column;gap:14px;overflow:hidden}
+.drawer.open{transform:none}
+.jl{display:flex;white-space:pre;border-radius:4px;transition:background 1.2s ease}
+.jl.is-new{background:rgba(241,236,226,.12);animation:jin .45s ease-out}
+.jk{color:var(--text-2)}.jv{color:var(--text)}
+@keyframes jin{from{opacity:0;transform:translateX(-10px)}}
+.seg{position:relative;height:8px;border-radius:4px;background:rgba(241,236,226,.08);overflow:hidden}
+.seg .fill{position:absolute;top:0;bottom:0;left:0;background:var(--agent-color);transition:width .15s linear}
+.seg .dv{position:absolute;top:0;bottom:0;width:3px;background:var(--bg)}
+.seg-lbl{display:flex;justify-content:space-between;gap:8px;font-size:17px;white-space:nowrap;color:var(--muted)}
+.is-cur .seg-lbl{color:var(--text)}
+.tl-dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--agent-color);margin-right:8px;vertical-align:1px}
+.out-wrap{transition:opacity .3s ease}
+.out-wrap.busy{animation:busy 1.1s ease-in-out infinite}
+@keyframes busy{50%{opacity:.55}}
+.qwrap{position:absolute;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:rgba(20,18,15,.78);animation:fadeIn .3s ease}
+.qcard{position:relative;width:720px;box-sizing:border-box;padding:40px 44px 34px;background:var(--paper);color:#1A1814;transform:rotate(-.6deg);animation:pop .45s cubic-bezier(.2,1.4,.4,1);display:flex;flex-direction:column;gap:22px}
+.qframe{position:absolute;inset:-6px;width:calc(100% + 12px);height:calc(100% + 12px);pointer-events:none;overflow:visible}
+.opt{appearance:none;font:inherit;cursor:pointer;flex:1 1 0;height:68px;border-radius:12px;font-size:23px;font-weight:700;background:#1A1814;color:#F3EEE3;border:0;transition:transform .15s ease}
+.opt:hover{transform:translateY(-2px)}
+.opt.alt{background:transparent;color:#1A1814;border:2.5px solid #1A1814}
+.skip{appearance:none;cursor:pointer;background:none;border:0;font:inherit;font-size:18px;color:#5C574E;text-decoration:underline;text-underline-offset:4px;padding:6px 4px}
+@keyframes fadeIn{from{opacity:0}}
+@keyframes pop{from{opacity:0;transform:rotate(-.6deg) scale(.92) translateY(10px)}}
+.panel{position:absolute;top:0;right:0;bottom:0;width:640px;transform:translateX(105%);transition:transform .45s cubic-bezier(.2,.8,.2,1);z-index:45;background:var(--surface);border-left:1px solid var(--line);box-shadow:-40px 0 80px -30px rgba(0,0,0,.8);display:flex;flex-direction:column}
+.panel.open{transform:none}
+.x{appearance:none;cursor:pointer;width:48px;height:48px;border-radius:12px;border:0;background:transparent;color:var(--text-2);display:inline-flex;align-items:center;justify-content:center}
+.x:hover{background:var(--surface-2);color:var(--text)}
+.tab{appearance:none;font:inherit;cursor:pointer;height:44px;padding:0 4px;margin-right:22px;border:0;background:transparent;color:var(--muted);font-size:19px;font-weight:600;border-bottom:2.5px solid transparent}
+.tab.is-on{color:var(--text);border-bottom-color:var(--text)}
+.bar{height:6px;border-radius:3px;background:rgba(241,236,226,.1);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:3px;background:var(--text-2)}
+.kv{display:flex;flex-direction:column;gap:3px}
+.kv dt{font-size:15px;color:var(--faint)}
+.kv dd{margin:0;font-size:18px}
+.no-motion *,.no-motion *::after{animation:none !important;transition:none !important}
+@media (prefers-reduced-motion:reduce){.s2d *,.s2d *::after{animation:none !important}}
+</style>
+</helmet>
+<div class="{{rootCls}}" style="position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #14120F; color: #F1ECE2; font-family: 'Geist', system-ui, sans-serif">
+<div class="gridpaper" aria-hidden="true"></div>
+
+<header style="position: absolute; left: 48px; right: 48px; top: 20px; height: 60px; display: flex; align-items: center; gap: 32px">
+<div style="display: flex; align-items: center; gap: 12px">
+<svg aria-hidden="true" width="46" height="36" viewBox="0 0 46 36"><path d="M3 28 Q6 21 9.5 25 T16 22.5" fill="none" stroke="#CFC8BB" stroke-width="2.4" stroke-linecap="round"></path><path d="M27.5 8.5 C31 8 33.5 13 35 18 C36.5 23.5 37 28 36 30 C35 31.6 32 31.8 27.5 31.6 C23 31.8 20 31.6 19.2 30 C18.4 28 19 23.5 20.6 18 C22.2 13 24 8.8 27.5 8.5 Z" fill="none" stroke="#CFC8BB" stroke-width="1.8" stroke-dasharray="3 2.6" stroke-linecap="round"></path><path d="M32 6 C35.5 6 37.5 11 39 16 C40.6 21.5 41.5 26 40.5 28 C39.5 29.6 36.6 29.8 32 29.8 C27.4 29.8 24.5 29.6 23.5 28 C22.5 26 23.4 21.5 25 16 C26.5 11 28.5 6 32 6 Z" fill="#F1ECE2" stroke="#0B0B0F" stroke-width="2"></path><path d="M32 6 Q31 3 33 1.6" fill="none" stroke="#F1ECE2" stroke-width="1.8" stroke-linecap="round"></path><circle cx="29.6" cy="17.5" r="2.4" fill="#0B0B0F"></circle><circle cx="34.6" cy="17.5" r="2.4" fill="#0B0B0F"></circle></svg>
+<span class="disp" style="font-size: 26px; font-weight: 800; letter-spacing: -0.02em">Sketch2Design</span>
+</div>
+<span style="font-size: 22px; color: #CFC8BB">{{stepText}}</span>
+<div style="margin-left: auto; display: flex; align-items: center; gap: 18px">
+<span class="mono" style="font-size: 36px; font-weight: 500; letter-spacing: -0.02em">{{clock}}</span>
+<button type="button" class="btn btn-ghost" onClick="{{reset}}" style="height: 52px; padding: 0 16px; font-size: 19px; font-weight: 600"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5.2 12.6 Q5 6.4 11.6 5.3 Q17.6 4.8 19 10.4 Q19.9 16.8 13.6 18.9 Q9.4 19.9 6.9 17.2"></path><path d="M4.4 7.6 L5.3 12.8 L10 11.1"></path></svg>Sıfırla</button>
+<button type="button" class="btn btn-primary" onClick="{{start}}" style="height: 52px; padding: 0 24px; font-size: 20px; font-weight: 700"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M7.6 5 Q7.1 12 7.7 19.1 Q13.9 15.7 19.3 12.2 Q13.4 8.3 7.6 5 Z"></path></svg>{{startLabel}}</button>
+</div>
+</header>
+
+<main style="position: absolute; left: 48px; right: 48px; top: 112px; height: 760px">
+<svg aria-hidden="true" width="1824" height="760" style="position: absolute; left: 0; top: 0; pointer-events: none; overflow: visible">
+<path d="M312 250 C328 232 340 262 352 236 S372 222 394 214" fill="none" stroke="#CFC8BB" stroke-width="3.2" stroke-linecap="round"></path>
+<path d="M380 206 L396 213 L386 226" fill="none" stroke="#CFC8BB" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M1428 208 L1478 208" fill="none" stroke="#F1ECE2" stroke-width="2.2"></path>
+<path d="M1469 202 L1479 208 L1469 214" fill="none" stroke="#F1ECE2" stroke-width="2.2" stroke-linejoin="miter"></path>
+</svg>
+
+<section aria-label="Giriş: kroki" style="position: absolute; left: 0; top: 0; width: 330px">
+<div style="display: flex; align-items: flex-end; gap: 6px; height: 56px; padding-left: 10px">
+<span class="hand" style="font-size: 36px; font-weight: 700; color: #F1ECE2; line-height: 1">senin krokin</span>
+<svg aria-hidden="true" width="46" height="44" viewBox="0 0 46 44"><path d="M4 8 C18 4 30 10 32 24 S30 36 28 40" fill="none" stroke="#CFC8BB" stroke-width="2.6" stroke-linecap="round"></path><path d="M21 33 L28 41 L35 33" fill="none" stroke="#CFC8BB" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</div>
+<div style="position: relative; margin-top: 10px; width: 296px; transform: rotate(-1.8deg); box-shadow: 0 18px 40px -18px #000">
+<span aria-hidden="true" style="position: absolute; left: -14px; top: -10px; width: 74px; height: 24px; background: rgba(226,210,166,0.62); transform: rotate(-24deg); z-index: 2"></span>
+<span aria-hidden="true" style="position: absolute; right: -16px; top: -6px; width: 70px; height: 24px; background: rgba(226,210,166,0.62); transform: rotate(18deg); z-index: 2"></span>
+<div style="line-height: 0"><dc-import name="Sketch" w="296" reveal="{{reveal}}" ask="{{askMode}}" answer="{{answer}}" grid="{{false}}" hint-size="296px,524px"></dc-import></div>
+</div>
+<div style="margin-top: 22px; padding-left: 8px; display: flex; flex-direction: column; gap: 4px; font-size: 17px; color: #A39B8D">
+<span>{{foundTxt}}</span>
+<span class="mono" style="font-size: 15px">sketchHash {{sketchHashTxt}}</span>
+</div>
+</section>
+
+<section aria-label="Agent'lar" style="position: absolute; left: 380px; top: 0; width: 1060px; height: 760px">
+<div style="position: relative; height: 357px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr))">
+<svg aria-hidden="true" width="1060" height="357" style="position: absolute; left: 0; top: 0; pointer-events: none">
+<path d="M192 212 C199 202 206 220 213 206 S226 214 232 207" fill="none" stroke="#CFC8BB" stroke-width="3.2" stroke-linecap="round"></path><path d="M222 199 L233 207 L222 215" fill="none" stroke="#CFC8BB" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M404 210 C412 203 420 215 428 207 S438 210 444 207" fill="none" stroke="#D8D1C4" stroke-width="2.9" stroke-linecap="round"></path><path d="M434 200 L445 207 L434 214" fill="none" stroke="#D8D1C4" stroke-width="2.9" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M616 208 C628 205 636 211 656 207" fill="none" stroke="#E4DED2" stroke-width="2.6" stroke-linecap="round"></path><path d="M646 200 L657 207 L646 214" fill="none" stroke="#E4DED2" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M828 208 L868 208" fill="none" stroke="#F1ECE2" stroke-width="2.2"></path><path d="M859 202 L869 208 L859 214" fill="none" stroke="#F1ECE2" stroke-width="2.2"></path>
+</svg>
+<sc-for list="{{slots}}" as="g" hint-placeholder-count="5">
+<button type="button" class="{{g.cls}}" onClick="{{g.open}}" aria-label="{{g.aria}}">
+<span class="spot" aria-hidden="true"></span>
+<div class="{{g.bzCls}}">
+<sc-if value="{{g.showBubble}}" hint-placeholder-val="{{ false }}">
+<div class="{{g.bubbleCls}}">{{g.bubbleText}}<sc-if value="{{g.hasSteps}}" hint-placeholder-val="{{ false }}"><span class="steps" aria-hidden="true"><sc-for list="{{g.steps}}" as="d" hint-placeholder-count="3"><i class="{{d.cls}}"></i></sc-for></span></sc-if></div>
+</sc-if>
+</div>
+<svg class="ch-svg {{g.c.cls}}" viewBox="0 0 240 250" width="{{g.c.w}}" height="{{g.c.h}}" role="img" aria-label="{{g.c.label}}" style="position: relative">
+<ellipse class="shadow" cx="120" cy="228" rx="64" ry="8"></ellipse>
+<g class="hop"><g class="squash">
+<g class="particles"><circle class="pt p1" cx="34" cy="70" r="5"></circle><circle class="pt p2 pt-w" cx="210" cy="104" r="3.5"></circle><circle class="pt p3 pt-w" cx="24" cy="150" r="3.5"></circle><path class="pt p4 spark" d="M214 140 v12 M208 146 h12"></path></g>
+<path class="antenna" d="M120 46 Q112 30 124 19"></path>
+<circle class="tint ol" cx="127" cy="16" r="8"></circle>
+<path class="tint ol" d="M120 40 C146 40 160 72 174 110 C190 152 204 182 199 199 C195 212 178 215 120 215 C62 215 45 212 41 199 C36 182 50 152 66 110 C80 72 94 40 120 40 Z"></path>
+<path class="shade" d="M44 186 C60 200 90 204 120 204 C150 204 180 200 196 186 C201 196 198 204 190 208 C176 213 160 213 120 213 C80 213 64 213 50 208 C42 204 39 196 44 186 Z"></path>
+<path class="shine" d="M80 112 C86 88 96 68 108 56"></path>
+<g class="face">
+<g class="cheeks {{g.c.blushCls}}"><ellipse cx="82" cy="142" rx="10" ry="5.5"></ellipse><ellipse cx="158" cy="142" rx="10" ry="5.5"></ellipse></g>
+<g class="{{g.c.openCls}}">
+<g class="eye"><circle class="white ol" cx="102" cy="118" r="{{g.c.rL}}"></circle><circle class="pupil" cx="{{g.c.pLx}}" cy="{{g.c.pLy}}" r="{{g.c.prL}}"></circle><circle class="glint" cx="{{g.c.gLx}}" cy="{{g.c.gLy}}" r="{{g.c.grL}}"></circle></g>
+<g class="eye"><circle class="white ol" cx="138" cy="118" r="{{g.c.rR}}"></circle><circle class="pupil" cx="{{g.c.pRx}}" cy="{{g.c.pRy}}" r="{{g.c.prR}}"></circle><circle class="glint" cx="{{g.c.gRx}}" cy="{{g.c.gRy}}" r="{{g.c.grR}}"></circle></g>
+<path class="tint ol lid {{g.c.lidCls}}" d="{{g.c.lidL}}"></path>
+<path class="tint ol lid {{g.c.lidCls}}" d="{{g.c.lidR}}"></path>
+</g>
+<g class="happy {{g.c.happyCls}}"><path d="M90 121 Q102 107 114 121"></path><path d="M126 121 Q138 107 150 121"></path></g>
+<path class="brow" d="{{g.c.browL}}"></path>
+<path class="brow" d="{{g.c.browR}}"></path>
+<path class="mouth {{g.c.mouthCls}}" d="{{g.c.mouth}}"></path>
+<path class="tongue {{g.c.tongueCls}}" d="M114 153 Q113 168 122 168 Q131 168 129 154 Z"></path>
+</g>
+<g class="acc acc-reader"><path d="M198 184 L220 210" stroke="#0B0B0F" stroke-width="13" stroke-linecap="round"></path><path d="M198 184 L220 210" stroke="#7A4A26" stroke-width="6" stroke-linecap="round"></path><circle cx="184" cy="166" r="23" fill="rgba(210,232,255,0.38)" stroke="#0B0B0F" stroke-width="6"></circle><circle cx="184" cy="166" r="17.5" fill="none" stroke="#DCE6F5" stroke-width="3"></circle><path d="M172 158 Q176 150 184 149" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round"></path></g>
+<g class="acc acc-qbubble"><path d="M170 72 L160 92 L184 78 Z" fill="#fff" stroke="#0B0B0F" stroke-width="4.5" stroke-linejoin="round"></path><circle cx="192" cy="52" r="27" fill="#fff" stroke="#0B0B0F" stroke-width="5"></circle><path d="M182 46 Q182 35 192 35 Q203 35 203 45 Q203 52 193 56 V61" fill="none" stroke="#0B0B0F" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="193" cy="70" r="3.6" fill="#0B0B0F"></circle></g>
+<g class="acc acc-designer"><g transform="rotate(-22 44 156)"><rect x="33" y="108" width="22" height="96" rx="3" fill="#F2C94C" stroke="#0B0B0F" stroke-width="4"></rect><path d="M33 122 h8 M33 134 h12 M33 146 h8 M33 158 h12 M33 170 h8 M33 182 h12 M33 194 h8" stroke="#0B0B0F" stroke-width="2.5"></path></g><path d="M168 166 C166 146 196 138 212 152 C226 165 218 190 198 190 C188 190 191 179 182 181 C172 183 169 176 168 166 Z" fill="#F3E6D3" stroke="#0B0B0F" stroke-width="4.5" stroke-linejoin="round"></path><circle cx="184" cy="160" r="5" fill="#4C8DFF"></circle><circle cx="199" cy="155" r="5" fill="#FFD23F"></circle><circle cx="210" cy="168" r="5" fill="#3DDC84"></circle><circle cx="203" cy="181" r="5" fill="#FF4D5E"></circle><path d="M78 62 C72 42 102 30 126 31 C152 32 168 46 161 60 C150 69 98 70 78 62 Z" fill="#2E3350" stroke="#0B0B0F" stroke-width="5" stroke-linejoin="round"></path><path d="M92 55 C110 59 140 59 154 53" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="4" stroke-linecap="round"></path></g>
+<g class="acc acc-generator"><g class="gear"><circle cx="46" cy="94" r="21" fill="none" stroke="#0B0B0F" stroke-width="14" stroke-dasharray="7 6.2"></circle><circle cx="46" cy="94" r="21" fill="none" stroke="#C9CED6" stroke-width="8" stroke-dasharray="7 6.2"></circle><circle cx="46" cy="94" r="17" fill="#C9CED6" stroke="#0B0B0F" stroke-width="4"></circle><circle cx="46" cy="94" r="6" fill="#0B0B0F"></circle></g><g transform="rotate(38 198 172)"><rect x="192" y="160" width="13" height="50" rx="6.5" fill="#C9CED6" stroke="#0B0B0F" stroke-width="4"></rect><circle cx="198.5" cy="152" r="14" fill="#C9CED6" stroke="#0B0B0F" stroke-width="4"></circle><rect x="193.5" y="136" width="10" height="13" rx="2" fill="#0B0B0F"></rect></g></g>
+<g class="acc acc-critic"><circle cx="102" cy="118" r="18.5" fill="rgba(255,255,255,0.10)" stroke="#0B0B0F" stroke-width="5"></circle><circle cx="138" cy="118" r="18.5" fill="rgba(255,255,255,0.10)" stroke="#0B0B0F" stroke-width="5"></circle><path d="M116 111 Q120 106 124 111 M83.5 114 L70 107 M156.5 114 L170 107" fill="none" stroke="#0B0B0F" stroke-width="4.5" stroke-linecap="round"></path><g transform="rotate(12 198 178)"><rect x="176" y="150" width="44" height="56" rx="6" fill="#F4F1EA" stroke="#0B0B0F" stroke-width="4.5"></rect><rect x="188" y="143" width="20" height="12" rx="3" fill="#9AA3AE" stroke="#0B0B0F" stroke-width="3.5"></rect><path d="M183 167 l4 4 l8 -9 M183 182 l4 4 l8 -9" fill="none" stroke="#1F9D55" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M184 194 l7 7 M191 194 l-7 7" stroke="#E5484D" stroke-width="3.5" stroke-linecap="round"></path><path d="M200 167 h13 M200 182 h13 M200 197 h10" stroke="#8A919C" stroke-width="3" stroke-linecap="round"></path></g></g>
+<g class="acc acc-notary"><path d="M72 146 Q120 200 168 146" fill="none" stroke="#0B0B0F" stroke-width="8" stroke-linecap="round"></path><path d="M72 146 Q120 200 168 146" fill="none" stroke="#F2C94C" stroke-width="4" stroke-dasharray="7 4" stroke-linecap="round"></path><circle cx="120" cy="180" r="16" fill="#F2C94C" stroke="#0B0B0F" stroke-width="4.5"></circle><path d="M120 172 L126.9 176 L126.9 184 L120 188 L113.1 184 L113.1 176 Z" fill="none" stroke="#0B0B0F" stroke-width="2.8" stroke-linejoin="round"></path></g>
+</g></g>
+<g class="badge badge-done"><circle cx="44" cy="42" r="18" fill="#3FBF6E" stroke="#0B0B0F" stroke-width="4.5"></circle><path d="M35 42 l6 6 l11 -12" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path></g>
+<g class="badge badge-retry"><circle cx="44" cy="42" r="18" fill="#E8A21A" stroke="#0B0B0F" stroke-width="4.5"></circle><path d="M51 39 A8 8 0 1 0 50 48" fill="none" stroke="#0B0B0F" stroke-width="3.6" stroke-linecap="round"></path><path d="M46 33 L52 39 L45 41" fill="none" stroke="#0B0B0F" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"></path></g>
+</svg>
+<span class="disp slot-name" style="position: relative; font-size: 28px; font-weight: 800; letter-spacing: -0.02em; margin-top: 4px">{{g.name}}</span>
+<span class="{{g.stCls}}" style="position: relative; margin-top: 2px">{{g.chip}}</span>
+</button>
+</sc-for>
+</div>
+
+<div class="{{loopCls}}" style="position: relative; height: 150px">
+<svg aria-hidden="true" width="1060" height="150" style="position: absolute; left: 0; top: 0; overflow: visible"><path class="main" d="M742 6 C746 70 690 96 636 94 C582 92 528 74 530 10"></path><path class="head" d="M520 24 L530 8 L541 23"></path></svg>
+<span class="hand loop-lbl" style="position: absolute; left: 556px; width: 160px; top: 24px; text-align: center; font-size: 30px; font-weight: 700; color: #F1ECE2; transform: rotate(-3deg)">bir tur daha!</span>
+<div style="position: absolute; left: 380px; width: 512px; top: 104px; display: flex; justify-content: center; align-items: baseline; gap: 12px">
+<sc-for list="{{scoreChips}}" as="sc" hint-placeholder-count="3"><span class="{{sc.cls}}">{{sc.v}}</span><span style="color: #8A8275; font-size: 22px">{{sc.arrow}}</span></sc-for>
+<span style="font-size: 17px; color: #A39B8D; margin-left: 12px">eşik 0.85</span>
+</div>
+</div>
+
+<div style="position: relative; height: 70px">
+<div class="{{specCls}}" style="left: {{specLeft}}px">
+<div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-size: 16px; font-weight: 600">design-spec</span><span class="mono" style="font-size: 15px; color: #A39B8D">v{{specV}}</span></div>
+<span class="mono" style="font-size: 14px; color: #A39B8D">{{specFields}} alan · {{specOwner}}</span>
+</div>
+</div>
+
+<div style="position: relative; display: flex; justify-content: space-between; align-items: flex-end; gap: 40px; padding: 18px 12px 0">
+<ul aria-label="Son olaylar" style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; min-width: 0; flex: 1 1 auto">
+<sc-if value="{{noEvents}}" hint-placeholder-val="{{ false }}"><li style="font-size: 17px; color: #8A8275">Başlatınca olanlar burada akar.</li></sc-if>
+<sc-for list="{{events}}" as="e" hint-placeholder-count="3">
+<li style="display: flex; gap: 14px; font-size: 17px; color: #A39B8D; opacity: {{e.op}}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis"><span class="mono" style="font-size: 15px; color: #8A8275; width: 64px; flex: none">{{e.time}}</span><span><b style="color: #CFC8BB; font-weight: 600">{{e.who}}</b> {{e.t}}</span></li>
+</sc-for>
+</ul>
+<div style="display: flex; flex-direction: column; align-items: flex-end; flex: none">
+<span style="font-size: 17px; color: #A39B8D">Eleştirmen skoru</span>
+<span class="mono" style="font-size: 64px; font-weight: 600; line-height: 1; letter-spacing: -0.03em; color: {{scoreColor}}">{{scoreBig}}</span>
+</div>
+</div>
+</section>
+
+<section aria-label="Çıkış: tasarım" style="position: absolute; left: 1490px; top: 0; width: 334px">
+<div style="height: 56px; display: flex; align-items: flex-end; justify-content: space-between">
+<span style="font-size: 20px; font-weight: 600; letter-spacing: 0.01em">Çıktı</span>
+<span style="font-size: 17px; color: #A39B8D">{{outLabel}}</span>
+</div>
+<div class="{{outWrapCls}}" style="margin-top: 10px; width: 320px; height: 555px; overflow: hidden; border-radius: 8px; line-height: 0; box-shadow: 0 0 0 1px rgba(241,236,226,0.14), 0 24px 50px -24px #000">
+<div style="width: 300px; height: 520px; transform: scale(1.0667); transform-origin: 0 0"><dc-import name="Output" level="{{outLevel}}" hint-size="300px,520px"></dc-import></div>
+</div>
+<div style="margin-top: 18px; display: flex; align-items: center; gap: 10px; font-size: 17px; color: #A39B8D; opacity: {{paletteOp}}; transition: opacity .5s ease">
+<span style="width: 20px; height: 20px; border-radius: 4px; background: #6E54FF"></span><span style="width: 20px; height: 20px; border-radius: 4px; background: #FFB84D"></span><span style="width: 20px; height: 20px; border-radius: 4px; background: #17162A; box-shadow: inset 0 0 0 1px #3E3A33"></span><span style="width: 20px; height: 20px; border-radius: 4px; background: #FFFDF8"></span>
+<span style="margin-left: 8px">Bricolage · Geist</span>
+</div>
+</section>
+</main>
+
+<button type="button" class="jtab" onClick="{{toggleJson}}" aria-expanded="{{jsonExpanded}}" aria-controls="s2d-json"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4.8 Q6.4 5 6.7 8.6 Q6.9 11.3 4.8 12.1 Q6.9 12.9 6.7 15.6 Q6.5 19.1 9 19.3 M15 4.8 Q17.6 5 17.3 8.6 Q17.1 11.3 19.2 12.1 Q17.1 12.9 17.3 15.6 Q17.5 19.1 15 19.3"></path></svg><span>spec.json · {{specFields}}</span></button>
+<aside id="s2d-json" class="{{drawerCls}}" aria-label="design-spec.json" aria-hidden="{{jsonHidden}}">
+<div style="display: flex; justify-content: space-between; align-items: center">
+<h2 class="mono" style="margin: 0; font-size: 18px; font-weight: 500">design-spec.json</h2>
+<button type="button" class="x" onClick="{{toggleJson}}" aria-label="Spec panelini kapat"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6.2 6.6 Q12 12.3 17.8 17.6 M17.5 6.3 Q12.2 11.8 6.4 17.9"></path></svg></button>
+</div>
+<div class="mono" style="font-size: 15px; line-height: 21px; display: flex; flex-direction: column">
+<sc-for list="{{jsonLines}}" as="ln" hint-placeholder-count="12">
+<div class="{{ln.cls}}"><span style="padding-left: {{ln.pad}}px"><span class="jk">{{ln.k}}</span><span class="jv">{{ln.v}}</span></span></div>
+</sc-for>
+</div>
+</aside>
+
+<footer style="position: absolute; left: 48px; right: 48px; bottom: 36px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; justify-content: space-between; align-items: baseline; font-size: 17px; color: #A39B8D"><span>{{tlNote}}</span><span>~40 sn · 5 agent</span></div>
+<div style="display: flex; gap: 10px">
+<sc-for list="{{segs}}" as="t" hint-placeholder-count="5">
+<div class="{{t.wrapCls}}" style="flex: {{t.flex}} 1 0; min-width: 0; display: flex; flex-direction: column; gap: 10px">
+<div class="seg"><div class="fill" style="width: {{t.fill}}%"></div><sc-for list="{{t.divs}}" as="dv" hint-placeholder-count="0"><span class="dv" style="left: {{dv.x}}%"></span></sc-for></div>
+<div class="seg-lbl"><span><span class="tl-dot" aria-hidden="true"></span>{{t.name}}</span><span class="mono" style="font-size: 15px">{{t.dur}}</span></div>
+</div>
+</sc-for>
+</div>
+</footer>
+
+<sc-if value="{{showAsk}}" hint-placeholder-val="{{ false }}">
+<div class="qwrap">
+<div class="qcard" role="dialog" aria-modal="true" aria-label="Okuyucu soruyor">
+<svg class="qframe" aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M1.2 2 Q30 0.6 60 1.6 T98.6 1.4 Q99.6 30 98.8 62 T98.4 98.4 Q70 99.6 40 98.6 T1.6 98.8 Q0.4 70 1.4 40 T1.2 2 Z" fill="none" stroke="#1A1814" stroke-width="2.6" vector-effect="non-scaling-stroke" stroke-linejoin="round"></path></svg>
+<span class="hand" style="font-size: 30px; font-weight: 700; color: #5C574E">Okuyucu soruyor:</span>
+<div style="display: flex; gap: 28px; align-items: center">
+<svg aria-hidden="true" width="170" height="104" viewBox="0 0 150 90" style="flex: none; background: #FBF8F1"><path d="M18 22 Q75 18 132 21 Q136 45 132 70 Q75 73 18 69 Q14 45 18 22 Z" fill="none" stroke="#2B2925" stroke-width="3" stroke-linejoin="round"></path><path d="M38 46 q7 -8 14 0 t14 0 t14 0 t14 0 t14 0" fill="none" stroke="#2B2925" stroke-width="2.6" stroke-linecap="round"></path><rect x="8" y="10" width="134" height="70" rx="6" fill="none" stroke="#E8A21A" stroke-width="3" stroke-dasharray="7 5"></rect></svg>
+<p class="hand" style="margin: 0; font-size: 50px; font-weight: 700; line-height: 0.98">Bu kutu bir buton mu, görsel mi?</p>
+</div>
+<div style="display: flex; gap: 14px">
+<button type="button" class="opt" onClick="{{pickButton}}">Buton</button>
+<button type="button" class="opt alt" onClick="{{pickImage}}">Görsel</button>
+</div>
+<div style="display: flex; justify-content: space-between; align-items: center">
+<span class="hand" style="font-size: 26px; color: #5C574E">{{askHint}}</span>
+<button type="button" class="skip" onClick="{{skipAsk}}">Atla</button>
+</div>
+</div>
+</div>
+</sc-if>
+
+<aside class="{{panelCls}}" aria-label="Agent detayı" aria-hidden="{{panelHidden}}">
+<div class="{{p.agCls}}" style="display: flex; align-items: center; gap: 18px; padding: 26px 30px 20px">
+<svg class="ch-svg {{p.c.cls}}" viewBox="0 0 240 250" width="{{p.c.w}}" height="{{p.c.h}}" role="img" aria-label="{{p.c.label}}" style="flex: none">
+<ellipse class="shadow" cx="120" cy="228" rx="64" ry="8"></ellipse>
+<g class="hop"><g class="squash">
+<path class="antenna" d="M120 46 Q112 30 124 19"></path>
+<circle class="tint ol" cx="127" cy="16" r="8"></circle>
+<path class="tint ol" d="M120 40 C146 40 160 72 174 110 C190 152 204 182 199 199 C195 212 178 215 120 215 C62 215 45 212 41 199 C36 182 50 152 66 110 C80 72 94 40 120 40 Z"></path>
+<path class="shade" d="M44 186 C60 200 90 204 120 204 C150 204 180 200 196 186 C201 196 198 204 190 208 C176 213 160 213 120 213 C80 213 64 213 50 208 C42 204 39 196 44 186 Z"></path>
+<g class="face">
+<g class="cheeks {{p.c.blushCls}}"><ellipse cx="82" cy="142" rx="10" ry="5.5"></ellipse><ellipse cx="158" cy="142" rx="10" ry="5.5"></ellipse></g>
+<g class="{{p.c.openCls}}">
+<g class="eye"><circle class="white ol" cx="102" cy="118" r="{{p.c.rL}}"></circle><circle class="pupil" cx="{{p.c.pLx}}" cy="{{p.c.pLy}}" r="{{p.c.prL}}"></circle></g>
+<g class="eye"><circle class="white ol" cx="138" cy="118" r="{{p.c.rR}}"></circle><circle class="pupil" cx="{{p.c.pRx}}" cy="{{p.c.pRy}}" r="{{p.c.prR}}"></circle></g>
+<path class="tint ol lid {{p.c.lidCls}}" d="{{p.c.lidL}}"></path>
+<path class="tint ol lid {{p.c.lidCls}}" d="{{p.c.lidR}}"></path>
+</g>
+<g class="happy {{p.c.happyCls}}"><path d="M90 121 Q102 107 114 121"></path><path d="M126 121 Q138 107 150 121"></path></g>
+<path class="brow" d="{{p.c.browL}}"></path>
+<path class="brow" d="{{p.c.browR}}"></path>
+<path class="mouth {{p.c.mouthCls}}" d="{{p.c.mouth}}"></path>
+</g>
+<g class="acc acc-reader"><path d="M198 184 L220 210" stroke="#0B0B0F" stroke-width="13" stroke-linecap="round"></path><path d="M198 184 L220 210" stroke="#7A4A26" stroke-width="6" stroke-linecap="round"></path><circle cx="184" cy="166" r="23" fill="rgba(210,232,255,0.38)" stroke="#0B0B0F" stroke-width="6"></circle></g>
+<g class="acc acc-designer"><path d="M168 166 C166 146 196 138 212 152 C226 165 218 190 198 190 C188 190 191 179 182 181 C172 183 169 176 168 166 Z" fill="#F3E6D3" stroke="#0B0B0F" stroke-width="4.5" stroke-linejoin="round"></path><path d="M78 62 C72 42 102 30 126 31 C152 32 168 46 161 60 C150 69 98 70 78 62 Z" fill="#2E3350" stroke="#0B0B0F" stroke-width="5" stroke-linejoin="round"></path></g>
+<g class="acc acc-generator"><circle cx="46" cy="94" r="21" fill="none" stroke="#0B0B0F" stroke-width="14" stroke-dasharray="7 6.2"></circle><circle cx="46" cy="94" r="17" fill="#C9CED6" stroke="#0B0B0F" stroke-width="4"></circle></g>
+<g class="acc acc-critic"><circle cx="102" cy="118" r="18.5" fill="rgba(255,255,255,0.10)" stroke="#0B0B0F" stroke-width="5"></circle><circle cx="138" cy="118" r="18.5" fill="rgba(255,255,255,0.10)" stroke="#0B0B0F" stroke-width="5"></circle></g>
+<g class="acc acc-notary"><path d="M72 146 Q120 200 168 146" fill="none" stroke="#0B0B0F" stroke-width="8" stroke-linecap="round"></path><circle cx="120" cy="180" r="16" fill="#F2C94C" stroke="#0B0B0F" stroke-width="4.5"></circle></g>
+</g></g>
+</svg>
+<div style="display: flex; flex-direction: column; gap: 4px; min-width: 0">
+<span class="disp" style="font-size: 40px; font-weight: 800; line-height: 1; letter-spacing: -0.025em">{{p.name}}</span>
+<span class="hand" style="font-size: 26px; color: #CFC8BB; line-height: 1.05">{{p.quote}}</span>
+</div>
+<button type="button" class="x" onClick="{{closePanel}}" aria-label="Paneli kapat" style="margin-left: auto; align-self: flex-start"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6.2 6.6 Q12 12.3 17.8 17.6 M17.5 6.3 Q12.2 11.8 6.4 17.9"></path></svg></button>
+</div>
+<div style="flex: 1 1 auto; overflow-y: auto; padding: 8px 30px 34px; display: flex; flex-direction: column; gap: 28px">
+<dl style="margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 24px; padding-bottom: 22px; border-bottom: 1px solid rgba(241,236,226,0.1)">
+<div class="kv"><dt>Rol</dt><dd>{{p.role}}</dd></div>
+<div class="kv"><dt>Durum · süre</dt><dd>{{p.stateLabel}} · {{p.dur}}</dd></div>
+<div class="kv"><dt>Girdi</dt><dd class="mono" style="font-size: 16px">{{p.inp}}</dd></div>
+<div class="kv"><dt>Çıktı</dt><dd class="mono" style="font-size: 16px">{{p.out}}</dd></div>
+<div class="kv" style="grid-column: 1 / -1"><dt>Neden böyle karar verdi</dt><dd style="font-size: 19px; line-height: 1.45; color: #CFC8BB">{{p.why}}</dd></div>
+</dl>
+
+<sc-if value="{{p.isReader}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; gap: 22px; align-items: flex-start">
+<div style="line-height: 0; flex: none; transform: rotate(-1deg)"><dc-import name="Sketch" w="250" reveal="9" ask="{{askMode}}" answer="{{answer}}" grid="{{false}}" hint-size="250px,442px"></dc-import></div>
+<ul style="margin: 0; padding: 0; list-style: none; flex: 1 1 auto; display: flex; flex-direction: column; gap: 10px">
+<sc-for list="{{p.els}}" as="el" hint-placeholder-count="9">
+<li style="display: flex; flex-direction: column; gap: 5px"><div style="display: flex; justify-content: space-between; font-size: 17px"><span>{{el.n}}</span><span class="mono" style="color: {{el.col}}">{{el.c}}</span></div><div class="bar"><i style="width: {{el.w}}%"></i></div></li>
+</sc-for>
+</ul>
+</div>
+<p style="margin: 0; font-size: 18px; color: #CFC8BB"><span style="color: #8A8275">Sorduğu:</span> <span class="hand" style="font-size: 26px; color: #F1ECE2">Bu kutu bir buton mu, görsel mi?</span><br><span style="color: #8A8275">Cevap:</span> <b>{{p.answerTxt}}</b></p>
+</sc-if>
+
+<sc-if value="{{p.isDesigner}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 18px">
+<div role="tablist" aria-label="Tasarımcı çıktıları" style="display: flex; border-bottom: 1px solid rgba(241,236,226,0.1)">
+<button type="button" role="tab" class="{{tabLayoutCls}}" aria-selected="{{tabLayoutSel}}" onClick="{{tabLayout}}">Yerleşim</button>
+<button type="button" role="tab" class="{{tabStyleCls}}" aria-selected="{{tabStyleSel}}" onClick="{{tabStyle}}">Stil</button>
+<button type="button" role="tab" class="{{tabContentCls}}" aria-selected="{{tabContentSel}}" onClick="{{tabContent}}">İçerik</button>
+</div>
+<sc-if value="{{tabIsLayout}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; gap: 22px; align-items: flex-start">
+<div style="line-height: 0; flex: none"><dc-import name="Sketch" w="250" reveal="0" ask="answered" answer="{{answer}}" grid="{{true}}" hint-size="250px,442px"></dc-import></div>
+<ul style="margin: 0; padding: 0 0 0 18px; display: flex; flex-direction: column; gap: 12px; font-size: 18px; line-height: 1.4; color: #CFC8BB">
+<li>12 sütun, 16px kenar, 6px oluk</li>
+<li>4 dikey bölge: menü, hero, buton, kartlar</li>
+<li>Kartlar 4'er sütun, eşit</li>
+<li>Buton başlıkla aynı sol çizgide</li>
+</ul>
+</div>
+</sc-if>
+<sc-if value="{{tabIsStyle}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 16px">
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 6px"><span style="height: 76px; border-radius: 6px; background: #6E54FF"></span><span style="font-size: 17px">Birincil</span><span class="mono" style="font-size: 15px; color: #A39B8D">#6E54FF</span></div>
+<div style="display: flex; flex-direction: column; gap: 6px"><span style="height: 76px; border-radius: 6px; background: #FFB84D"></span><span style="font-size: 17px">Vurgu</span><span class="mono" style="font-size: 15px; color: #A39B8D">#FFB84D</span></div>
+<div style="display: flex; flex-direction: column; gap: 6px"><span style="height: 76px; border-radius: 6px; background: #17162A; box-shadow: inset 0 0 0 1px #3E3A33"></span><span style="font-size: 17px">Metin</span><span class="mono" style="font-size: 15px; color: #A39B8D">#17162A</span></div>
+<div style="display: flex; flex-direction: column; gap: 6px"><span style="height: 76px; border-radius: 6px; background: #FFFDF8"></span><span style="font-size: 17px">Zemin</span><span class="mono" style="font-size: 15px; color: #A39B8D">#FFFDF8</span></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px"><span class="disp" style="font-size: 34px; font-weight: 800; letter-spacing: -0.02em">Bricolage Grotesque</span><span style="font-size: 18px; color: #CFC8BB">Geist, gövde ve arayüz için</span></div>
+<p class="hand" style="margin: 0; font-size: 28px; line-height: 1.1; color: #F1ECE2">"Krokide başlık el yazısıyla kocaman. Karakterli bir font seçtim, metni de koyu tuttum ki okunsun."</p>
+</div>
+</sc-if>
+<sc-if value="{{tabIsContent}}" hint-placeholder-val="{{ false }}">
+<dl style="margin: 0; display: flex; flex-direction: column; gap: 16px">
+<div class="kv"><dt>Başlık</dt><dd class="disp" style="font-size: 30px; font-weight: 800; letter-spacing: -0.02em">Fikrini çiz, tasarımı al.</dd></div>
+<div class="kv"><dt>Alt metin</dt><dd>Krokiden canlı tasarıma, saniyeler içinde.</dd></div>
+<div class="kv"><dt>Buton</dt><dd>Hemen dene →</dd></div>
+<div class="kv"><dt>Kartlar</dt><dd>Çiz · Üret · Mühürle</dd></div>
+</dl>
+</sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{p.isGenerator}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 18px">
+<span style="font-size: 18px; color: #A39B8D">Denemeler · {{p.attemptCount}}</span>
+<sc-if value="{{p.noAttempts}}" hint-placeholder-val="{{ false }}"><p class="hand" style="margin: 0; font-size: 28px; color: #CFC8BB">"Henüz bir şey üretmedim, sıra bende değil."</p></sc-if>
+<sc-for list="{{p.attempts}}" as="at" hint-placeholder-count="3">
+<div style="display: flex; gap: 20px; align-items: center">
+<div style="width: 120px; height: 208px; overflow: hidden; border-radius: 6px; line-height: 0; flex: none; box-shadow: 0 0 0 1px rgba(241,236,226,0.14)"><div style="width: 300px; height: 520px; transform: scale(0.4); transform-origin: 0 0"><dc-import name="Output" level="{{at.lvl}}" hint-size="300px,520px"></dc-import></div></div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span class="disp" style="font-size: 28px; font-weight: 800; letter-spacing: -0.02em">Taslak {{at.n}}</span>
+<span class="hand" style="font-size: 26px; color: #CFC8BB; line-height: 1.05">{{at.note}}</span>
+<span style="font-size: 17px; color: #A39B8D">{{at.dur}} · skor <span class="mono" style="color: {{at.col}}">{{at.score}}</span></span>
+</div>
+</div>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{p.isCritic}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; gap: 18px; align-items: flex-start">
+<div style="display: flex; flex-direction: column; gap: 8px"><div style="line-height: 0; transform: rotate(-1deg)"><dc-import name="Sketch" w="230" reveal="0" ask="answered" answer="{{answer}}" grid="{{false}}" hint-size="230px,407px"></dc-import></div><span class="hand" style="font-size: 24px; color: #CFC8BB">kroki</span></div>
+<div style="display: flex; flex-direction: column; gap: 8px"><div style="width: 230px; height: 399px; overflow: hidden; border-radius: 6px; line-height: 0; box-shadow: 0 0 0 1px rgba(241,236,226,0.14)"><div style="width: 300px; height: 520px; transform: scale(0.7667); transform-origin: 0 0"><dc-import name="Output" level="{{p.cmpLevel}}" hint-size="300px,520px"></dc-import></div></div><span style="font-size: 17px; color: #A39B8D">{{p.cmpLabel}}</span></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 12px">
+<sc-for list="{{p.crit}}" as="cr" hint-placeholder-count="4">
+<div style="display: flex; flex-direction: column; gap: 5px"><div style="display: flex; justify-content: space-between; font-size: 18px"><span>{{cr.n}}</span><span class="mono">{{cr.v}}</span></div><div class="bar"><i style="width: {{cr.w}}%"></i></div></div>
+</sc-for>
+</div>
+<div style="display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap"><span style="font-size: 17px; color: #A39B8D">Skor geçmişi</span><sc-for list="{{scoreChips}}" as="sc" hint-placeholder-count="3"><span class="{{sc.cls}}">{{sc.v}}</span><span style="color: #8A8275">{{sc.arrow}}</span></sc-for></div>
+</div>
+</sc-if>
+
+<sc-if value="{{p.isNotary}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 18px">
+<sc-if value="{{p.sealed}}" hint-placeholder-val="{{ false }}"><span style="display: inline-flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 600; color: #86DDA6"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.8 Q7.6 15.2 9.9 17.6 Q14 11 19.4 6.2"></path></svg>Zincire mühürlendi</span></sc-if>
+<dl style="margin: 0; display: flex; flex-direction: column; gap: 14px">
+<div class="kv"><dt>sketchHash</dt><dd class="mono">{{p.h1}}</dd></div>
+<div class="kv"><dt>specHash</dt><dd class="mono">{{p.h2}}</dd></div>
+<div class="kv"><dt>İşlem · Monad testnet</dt><dd class="mono">{{p.h3}}</dd></div>
+</dl>
+<a href="#" style="display: inline-flex; align-items: center; gap: 8px; font-size: 19px; font-weight: 600">Monad explorer'da aç<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M7 17 Q12 12 16.6 7.4 M10 6.8 Q13.6 6.6 17.1 7 Q17.4 10.6 17.2 14"></path></svg></a>
+</div>
+</sc-if>
+</div>
+</aside>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"preview":{"editor":"enum","options":["start","ask","loop","end"],"default":"loop"},"motion":{"editor":"boolean","default":true},"$preview":{"width":1920,"height":1080}}'>
+var ASK_AT = 5.5, AUTO = 8, END = 39.6, SLOT_W = 212;
+
+var AGENTS = [
+  { id: 'reader', no: '01', name: 'Okuyucu', role: 'Krokideki öğeleri tanır', inp: 'kroki.png', out: '9 öğe + 1 cevap', quote: '"Ne çizdiysen okurum. Emin değilsem sorarım."',
+    why: 'Kutu#5 hem buton hem görsel olabilirdi, güven 0.52 kaldı. Tahmin etmek yerine sana sordu.' },
+  { id: 'designer', no: '02', name: 'Tasarımcı', role: 'Grid, palet, font, metin', inp: 'öğe listesi', out: 'layout · style · content', quote: '"Grid’i, rengi, fontu bana bırak."',
+    why: 'Kroki dört dikey bölgeye ayrılıyor; 12 sütun hizayı korur. Mor birincil renk, koyu metinle rahat okunur.' },
+  { id: 'generator', no: '03', name: 'Üretici', role: 'Tasarımı üretir', inp: 'design-spec', out: '3 taslak', quote: '"Spec’i ver, gerisini ben hallederim."',
+    why: 'Eleştirmen ne dediyse onu düzeltti: önce hizalama, sonra kontrast.' },
+  { id: 'critic', no: '04', name: 'Eleştirmen', role: 'Krokiyle kıyaslar, puanlar', inp: 'kroki + taslak', out: 'skor + not', quote: '"Krokiye benzemiyorsa geri yollarım. Kusura bakma."',
+    why: 'Eşik 0.85. İlk taslakta buton yanlış yerdeydi ve başlık küçüktü. Üçüncüde her kriter 0.8’in üstüne çıktı.' },
+  { id: 'notary', no: '05', name: 'Noter', role: 'Kaynağı zincire mühürler', inp: 'kroki + spec', out: 'Monad tx', quote: '"Kim çizdi, ne çıktı, hepsi zincirde."',
+    why: 'Kroki ve spec’in hash’i zincire yazılır; tasarımın bu krokiden çıktığı sonradan doğrulanabilir.' }
+];
+
+var O_MOUTH = 'M114 151 a6 7 0 1 0 12 0 a6 7 0 1 0 -12 0';
+var FACES = {
+  reader:    { rL: 18, rR: 18, pr: 8, dy: -1, browL: 'M86 92 Q100 84 113 91', browR: 'M127 91 Q140 84 154 92', mouth: O_MOUTH, mFill: true },
+  designer:  { rL: 15, rR: 15, pr: 7, eyes: 'happy', blush: true, browL: 'M90 98 Q101 94 112 98', browR: 'M128 98 Q139 94 150 98', mouth: 'M103 145 Q120 163 137 145' },
+  generator: { rL: 16, rR: 16, pr: 8.5, browL: 'M87 93 L112 88', browR: 'M128 88 L153 93', mouth: 'M103 144 Q120 168 137 144 Z', mFill: true, tongue: true },
+  critic:    { rL: 15, rR: 15, pr: 7, dx: 4, browL: 'M87 100 L113 100', browR: 'M127 89 Q140 80 153 87', mouth: 'M107 153 Q118 151 133 145' },
+  notary:    { rL: 15, rR: 15, pr: 7, dy: -3, lid: 0.25, browL: 'M89 95 Q101 91 112 94', browR: 'M128 94 Q139 91 151 95', mouth: 'M108 148 Q120 157 132 148' }
+};
+var STATE_NAMES = { portrait: 'hazır', waiting: 'sırada', working: 'çalışıyor', asking: 'soru soruyor', done: 'bitti', error: 'tekrar' };
+
+function r1(n) { return Math.round(n * 10) / 10; }
+function fmt1(n) { return (Math.round(n * 10) / 10).toFixed(1).replace('.', ','); }
+function clock(T) { var m = Math.floor(T / 60), s = T - m * 60; return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s.toFixed(1).replace('.', ','); }
+function lidPath(cx, cy, r, frac) { var R = r + 2.5, h = frac * r, y = cy - h, dx = Math.sqrt(Math.max(R * R - h * h, 0)); return 'M' + r1(cx - dx) + ' ' + r1(y) + ' A' + R + ' ' + R + ' 0 0 1 ' + r1(cx + dx) + ' ' + r1(y) + ' Z'; }
+function findAgent(id) { for (var i = 0; i < AGENTS.length; i++) { if (AGENTS[i].id === id) return AGENTS[i]; } return AGENTS[0]; }
+
+function makeChar(id, state, size) {
+  var f = Object.assign({ dx: 0, dy: 0, pr: 7, lid: null, eyes: 'open', mFill: false, tongue: false, blush: false }, FACES[id]);
+  if (state === 'waiting') { f.eyes = 'open'; f.lid = 0; f.dy = 1; f.mouth = 'M112 151 Q120 153 128 151'; f.mFill = false; f.tongue = false; f.blush = false; }
+  else if (state === 'asking') { f.eyes = 'open'; f.lid = null; f.dx = 0; f.dy = -3; f.browL = 'M85 87 Q99 77 113 86'; f.browR = 'M127 86 Q141 77 155 87'; f.mouth = O_MOUTH; f.mFill = true; f.tongue = false; }
+  else if (state === 'done') { f.eyes = 'happy'; f.lid = null; f.browL = 'M90 94 Q101 89 112 94'; f.browR = 'M128 94 Q139 89 150 94'; f.mouth = 'M101 144 Q120 172 139 144 Z'; f.mFill = true; f.tongue = false; f.blush = true; }
+  else if (state === 'error') { f.eyes = 'open'; f.lid = null; f.dx = 0; f.dy = 1; f.browL = 'M88 92 L113 102'; f.browR = 'M127 102 L152 92'; f.mouth = 'M108 157 Q120 146 132 157'; f.mFill = false; f.tongue = false; f.blush = false; }
+  var rL = f.rL, rR = f.rR, prL = f.prL || f.pr, prR = f.prR || f.pr;
+  var pLx = r1(102 + f.dx * rL / 15), pLy = r1(118 + f.dy * rL / 15), pRx = r1(138 + f.dx * rR / 15), pRy = r1(118 + f.dy * rR / 15);
+  var hasLid = f.lid !== null && f.lid !== undefined;
+  return {
+    cls: 'ag-' + id + ' st-' + state, w: size, h: Math.round(size * 250 / 240),
+    label: findAgent(id).name + ', ' + (STATE_NAMES[state] || state),
+    rL: rL, rR: rR, prL: prL, prR: prR, pLx: pLx, pLy: pLy, pRx: pRx, pRy: pRy,
+    gLx: r1(pLx + prL * 0.38), gLy: r1(pLy - prL * 0.42), grL: r1(Math.max(prL * 0.32, 2)),
+    gRx: r1(pRx + prR * 0.38), gRy: r1(pRy - prR * 0.42), grR: r1(Math.max(prR * 0.32, 2)),
+    openCls: f.eyes === 'open' ? 'eyes' : 'eyes is-hidden', happyCls: f.eyes === 'happy' ? '' : 'is-hidden',
+    lidCls: hasLid ? '' : 'is-hidden', lidL: hasLid ? lidPath(102, 118, rL, f.lid) : 'M0 0', lidR: hasLid ? lidPath(138, 118, rR, f.lid) : 'M0 0',
+    browL: f.browL, browR: f.browR, mouth: f.mouth, mouthCls: f.mFill ? 'm-fill' : 'm-line',
+    tongueCls: f.tongue ? '' : 'is-hidden', blushCls: f.blush ? '' : 'is-hidden'
+  };
+}
+
+var ACTIVE = { reader: [[0, 5.5]], designer: [[5.5, 14.3]], generator: [[14.3, 19.1], [22.1, 26.2], [28.7, 32.3]], critic: [[19.1, 22.1], [26.2, 28.7], [32.3, 34.8]], notary: [[34.8, 39.6]] };
+var SCORES = [{ v: '0.61', at: 21.4, n: 0.61 }, { v: '0.78', at: 28.0, n: 0.78 }, { v: '0.87', at: 34.1, n: 0.87 }];
+var CRIT = [
+  [['Yerleşim uyumu', 0.52], ['Öğe eşleşmesi', 0.74], ['Hiyerarşi', 0.63], ['Kontrast', 0.55]],
+  [['Yerleşim uyumu', 0.86], ['Öğe eşleşmesi', 0.82], ['Hiyerarşi', 0.76], ['Kontrast', 0.68]],
+  [['Yerleşim uyumu', 0.90], ['Öğe eşleşmesi', 0.89], ['Hiyerarşi', 0.86], ['Kontrast', 0.83]]
+];
+function scriptTime(T, answerAt) { if (T < ASK_AT) return T; if (answerAt === null || answerAt === undefined) return ASK_AT; return ASK_AT + (T - answerAt); }
+function accrued(id, s) { var sum = 0; ACTIVE[id].forEach(function (iv) { if (s > iv[0]) sum += Math.min(s, iv[1]) - iv[0]; }); return sum; }
+function totalOf(id) { var sum = 0; ACTIVE[id].forEach(function (iv) { sum += iv[1] - iv[0]; }); return sum; }
+function att(s) { return s < 22.7 ? 1 : (s < 29.3 ? 2 : 3); }
+function agentState(id, s, answered) {
+  if (s < 0) return 'portrait';
+  if (id === 'reader') return s < ASK_AT ? 'working' : (answered ? 'done' : 'asking');
+  if (id === 'designer') return s < 6.3 ? 'waiting' : (s < 14.3 ? 'working' : 'done');
+  if (id === 'generator') {
+    if (s < 15.1) return 'waiting'; if (s < 19.1) return 'working'; if (s < 22.1) return 'waiting'; if (s < 22.7) return 'error';
+    if (s < 26.2) return 'working'; if (s < 28.7) return 'waiting'; if (s < 29.3) return 'error'; if (s < 32.3) return 'working'; return 'done';
+  }
+  if (id === 'critic') {
+    if (s < 19.1) return 'waiting'; if (s < 21.4) return 'working'; if (s < 22.7) return 'error'; if (s < 26.2) return 'waiting';
+    if (s < 28.0) return 'working'; if (s < 29.3) return 'error'; if (s < 32.3) return 'waiting'; if (s < 34.1) return 'working'; return 'done';
+  }
+  return s < 35.6 ? 'waiting' : (s < END ? 'working' : 'done');
+}
+function steps(times, labels, s) {
+  var idx = 0;
+  for (var i = 0; i < times.length; i++) { if (s >= times[i]) idx = i; }
+  return { text: labels[idx], dots: times.map(function (t, i) { return { cls: i < idx ? 'done' : (i === idx ? 'active' : '') }; }) };
+}
+function bubbleFor(id, st, s, answer) {
+  var n = att(s);
+  if (id === 'reader') {
+    if (st === 'working') { var r = steps([0, 1.8, 3.5], ['Hmm, bu çizgiler ne diyor…', 'Kutuları tek tek sayıyorum', '9 öğe buldum, fena değil!'], s); return { show: true, kind: 'work', text: r.text, steps: r.dots }; }
+    if (st === 'asking') return { show: true, kind: 'ask', text: 'Şu kutuya takıldım. Sana soracağım!' };
+    if (st === 'done' && s - ASK_AT < 0.8) return { show: true, kind: 'done', text: answer + ' dedin, not aldım.' };
+  }
+  if (id === 'designer') {
+    if (st === 'working') { var d = steps([6.3, 9.0, 11.6], ['12 sütun, hizalar cetvel gibi', 'Mor + turuncu, bence tam olur', 'Başlığı ben yazayım, kısa ve net'], s); return { show: true, kind: 'work', text: d.text, steps: d.dots }; }
+    if (st === 'done' && s < 15.1) return { show: true, kind: 'done', text: 'Spec hazır. Üretici, sende!' };
+  }
+  if (id === 'generator' && st === 'working') {
+    var start = [15.1, 22.7, 29.3][n - 1], dur = [4, 3.5, 3][n - 1];
+    var L = [['Kolları sıvadım, parçalar diziliyor', 'Taslak 1 çıktı, bak bakalım!'], ['Tamam tamam, hizayı düzeltiyorum', 'Taslak 2. Şimdi nasıl?'], ['Kontrastı açıyorum, son tur', 'Taslak 3! Bu sefer olmuştur.']][n - 1];
+    var g = steps([start, start + dur * 0.6], L, s);
+    return { show: true, kind: 'work', text: g.text, steps: g.dots };
+  }
+  if (id === 'critic') {
+    if (st === 'working') return { show: true, kind: 'work', text: n === 1 ? 'Krokiyle yan yana koyuyorum…' : 'Bakalım bu sefer ne yapmış…' };
+    if (st === 'error') return { show: true, kind: 'err', text: n === 1 ? 'Başlık krokidekinden küçük kalmış, bir tur daha.' : 'Buton hâlâ soluk. 0.78, olmadı.' };
+    if (st === 'done' && s < 35.5) return { show: true, kind: 'done', text: '0.87. Peki, ikna oldum.' };
+  }
+  if (id === 'notary') {
+    if (st === 'working') { var q = steps([35.6, 36.9, 38.2], ['Krokinin parmak izini alıyorum', 'Spec’i de mühürlüyorum', 'Monad’a yazıyorum, imza bende'], s); return { show: true, kind: 'work', text: q.text, steps: q.dots }; }
+    if (st === 'done') return { show: true, kind: 'done', text: 'Mühürlendi. Artık kayıtlı.' };
+  }
+  return { show: false, kind: 'work', text: '' };
+}
+function specIdx(s) { if (s < 5.5) return 0; if (s < 14.3) return 1; if (s < 19.1) return 2; if (s < 22.1) return 3; if (s < 26.2) return 2; if (s < 28.7) return 3; if (s < 32.3) return 2; if (s < 34.8) return 3; return 4; }
+function outLevel(s) { if (s < 6.3) return 0; if (s < 9.0) return 1; if (s < 11.6) return 2; if (s < 17.5) return 3; if (s < 24.8) return 4; if (s < 31.1) return 5; if (s < END) return 6; return 7; }
+var OUT_LABELS = ['bekleniyor', 'grid', 'palet', 'içerik', 'taslak 1', 'taslak 2', 'taslak 3', 'mühürlendi'];
+
+var JL = [
+  { k: '', v: '{', ind: 0, at: -1, ag: 'sys' },
+  { k: '"source": ', v: '{', ind: 1, at: 1.0, ag: 'reader' },
+  { k: '"sketch": ', v: '"kroki.png",', ind: 2, at: 1.0, ag: 'reader', f: 1 },
+  { k: '"elements": ', v: '9,', ind: 2, at: 3.5, ag: 'reader', f: 1 },
+  { k: '"ambiguous": ', dyn: 'amb', ind: 2, at: 5.51, ag: 'reader', f: 1 },
+  { k: '', v: '},', ind: 1, at: 1.0, ag: 'reader' },
+  { k: '"layout": ', v: '{', ind: 1, at: 6.6, ag: 'designer' },
+  { k: '"grid": ', v: '"12 sütun · 16px",', ind: 2, at: 7.6, ag: 'designer', f: 1 },
+  { k: '"sections": ', v: '["nav","hero","cta","kart"]', ind: 2, at: 8.6, ag: 'designer', f: 1 },
+  { k: '', v: '},', ind: 1, at: 6.6, ag: 'designer' },
+  { k: '"style": ', v: '{', ind: 1, at: 9.2, ag: 'designer' },
+  { k: '"palette": ', v: '["#6E54FF","#FFB84D"],', ind: 2, at: 10.0, ag: 'designer', f: 1 },
+  { k: '"font": ', v: '"Bricolage / Geist"', ind: 2, at: 10.8, ag: 'designer', f: 1 },
+  { k: '', v: '},', ind: 1, at: 9.2, ag: 'designer' },
+  { k: '"content": ', v: '{', ind: 1, at: 11.8, ag: 'designer' },
+  { k: '"title": ', v: '"Fikrini çiz, tasarımı al.",', ind: 2, at: 12.5, ag: 'designer', f: 1 },
+  { k: '"cta": ', v: '"Hemen dene"', ind: 2, at: 13.4, ag: 'designer', f: 1 },
+  { k: '', v: '},', ind: 1, at: 11.8, ag: 'designer' },
+  { k: '"render": ', dyn: 'render', ind: 1, at: 15.1, ch: [22.7, 29.3], ag: 'generator', f: 1 },
+  { k: '"review": ', v: '{', ind: 1, at: 19.3, ag: 'critic' },
+  { k: '"score": ', dyn: 'score', ind: 2, at: 21.4, ch: [28.0, 34.1], ag: 'critic', f: 1 },
+  { k: '"passed": ', dyn: 'passed', ind: 2, at: 21.4, ch: [34.1], ag: 'critic', f: 1 },
+  { k: '', v: '},', ind: 1, at: 19.3, ag: 'critic' },
+  { k: '"provenance": ', v: '{', ind: 1, at: 35.8, ag: 'notary' },
+  { k: '"sketchHash": ', v: '"0x9f3a…c21e",', ind: 2, at: 36.9, ag: 'notary', f: 1 },
+  { k: '"specHash": ', v: '"0x41d7…8b02",', ind: 2, at: 38.2, ag: 'notary', f: 1 },
+  { k: '"tx": ', v: '"0x7c2e…a913"', ind: 2, at: 39.6, ag: 'notary', f: 1 },
+  { k: '', v: '}', ind: 1, at: 35.8, ag: 'notary' },
+  { k: '', v: '}', ind: 0, at: -1, ag: 'sys' }
+];
+var EV = [
+  { at: 0, ag: 'reader', t: 'krokiyi aldı' },
+  { at: 3.5, ag: 'reader', t: '9 öğe buldu' },
+  { at: 5.5, ag: 'reader', t: 'bir soru sordu' },
+  { at: 5.51, ag: 'user', t: 'ANSWER' },
+  { at: 9.0, ag: 'designer', t: '12 sütunlu grid kurdu' },
+  { at: 11.6, ag: 'designer', t: 'palet ve fontu seçti' },
+  { at: 14.3, ag: 'designer', t: 'spec’i teslim etti' },
+  { at: 17.5, ag: 'generator', t: 'taslak 1’i üretti' },
+  { at: 21.4, ag: 'critic', t: '0.61 verdi, geri yolladı' },
+  { at: 24.8, ag: 'generator', t: 'taslak 2’yi üretti' },
+  { at: 28.0, ag: 'critic', t: '0.78 verdi, geri yolladı' },
+  { at: 31.1, ag: 'generator', t: 'taslak 3’ü üretti' },
+  { at: 34.1, ag: 'critic', t: '0.87 verdi, onayladı' },
+  { at: 39.6, ag: 'notary', t: 'zincire yazdı · tx 0x7c2e…a913' }
+];
+
+class Component extends DCLogic {
+  componentWillUnmount() { if (this.iv) clearInterval(this.iv); }
+  start() {
+    var self = this;
+    if (this.iv) clearInterval(this.iv);
+    this.t0 = Date.now();
+    this.setState({ run: true, fin: false, T: 0, answerAt: null, answer: null, auto: false, skipped: false });
+    this.iv = setInterval(function () { self.tick(); }, 100);
+  }
+  tick() {
+    var st = this.state || {};
+    var T = (Date.now() - this.t0) / 1000;
+    if ((st.answerAt === null || st.answerAt === undefined) && T >= ASK_AT + AUTO) { this.setState({ T: T, answerAt: T, answer: 'Buton', auto: true }); return; }
+    var s = scriptTime(T, st.answerAt);
+    if (s >= END + 0.4) { clearInterval(this.iv); this.iv = null; this.setState({ T: T, run: false, fin: true }); return; }
+    this.setState({ T: T });
+  }
+  reset() {
+    if (this.iv) clearInterval(this.iv);
+    this.iv = null;
+    this.setState({ run: false, fin: false, T: 0, answerAt: null, answer: null, auto: false, skipped: false, forceStart: true });
+  }
+  answerWith(v, skipped) {
+    var st = this.state || {};
+    if (!st.run || (st.answerAt !== null && st.answerAt !== undefined)) return;
+    var T = (Date.now() - this.t0) / 1000;
+    if (T < ASK_AT) return;
+    this.setState({ T: T, answerAt: T, answer: v, auto: false, skipped: !!skipped });
+  }
+  renderVals() {
+    var self = this;
+    var st = this.state || {};
+    var motion = this.props.motion ?? true;
+    var mode = (st.run || st.fin) ? 'live' : (st.forceStart ? 'start' : (this.props.preview || 'loop'));
+    var s, T, answered, answer, wait, auto = false, skipped = false;
+    if (mode === 'live') {
+      T = st.T || 0; s = scriptTime(T, st.answerAt);
+      answered = st.answerAt !== null && st.answerAt !== undefined;
+      answer = st.answer || 'Buton'; auto = !!st.auto; skipped = !!st.skipped;
+      wait = answered ? st.answerAt - ASK_AT : Math.max(0, T - ASK_AT);
+    } else if (mode === 'ask') { s = ASK_AT; answered = false; answer = 'Buton'; wait = 1.7; T = ASK_AT + wait; }
+    else if (mode === 'loop') { s = 21.8; answered = true; answer = 'Buton'; wait = 2.4; T = s + wait; }
+    else if (mode === 'end') { s = END + 0.4; answered = true; answer = 'Buton'; wait = 2.4; T = END + wait; }
+    else { s = -1; answered = false; answer = 'Buton'; wait = 0; T = 0; }
+    var started = s >= 0;
+    var ansLow = answer === 'Görsel' ? 'görsel' : 'buton';
+    function realT(at) { return at <= ASK_AT ? at : at + wait; }
+
+    var states = {};
+    AGENTS.forEach(function (a) { states[a.id] = agentState(a.id, s, answered); });
+    var slots = AGENTS.map(function (a, i) {
+      var stt = states[a.id];
+      var b = bubbleFor(a.id, stt, s, answer);
+      var chip = STATE_NAMES[stt];
+      if (stt === 'done') chip = 'bitti · ' + fmt1(accrued(a.id, s)) + ' sn';
+      var stCls = 'st-txt' + (stt === 'working' || stt === 'asking' ? ' on' : (stt === 'done' ? ' ok' : (stt === 'error' ? ' bad' : '')));
+      return {
+        name: a.name,
+        cls: 'slot ag-' + a.id + (stt === 'working' ? ' is-working' : ''),
+        bzCls: 'bz ' + (i === 0 ? 'al-l' : (i === 4 ? 'al-r' : 'al-c')),
+        aria: a.name + ': ayrıntıları aç',
+        open: function () { self.setState({ pid: a.id, popen: true }); },
+        showBubble: b.show, bubbleText: b.text, bubbleCls: 'bubble b-' + b.kind,
+        hasSteps: !!b.steps, steps: b.steps || [],
+        chip: chip, stCls: stCls,
+        c: makeChar(a.id, stt, 168)
+      };
+    });
+
+    var stepText = 'Hazır. Başlat’a bas, ekip işe koyulsun.';
+    if (started) {
+      if (states.reader === 'working') stepText = 'Okuyucu krokini okuyor';
+      else if (states.reader === 'asking') stepText = 'Okuyucu sana bir şey soruyor';
+      else if (s < 14.3) stepText = 'Tasarımcı spec’i kuruyor';
+      else if (s < 34.8) stepText = 'Üretici ile Eleştirmen pazarlıkta · deneme ' + att(s);
+      else if (s < END) stepText = 'Noter mühür basıyor';
+      else stepText = 'Bitti. Tasarım zincirde.';
+    }
+
+    var lines = [], fields = 0, sections = 0;
+    JL.forEach(function (l) {
+      if (s < l.at) return;
+      var v = l.v;
+      if (l.dyn === 'amb') v = '"kutu#5 → ' + ansLow + '",';
+      if (l.dyn === 'render') v = '{ "attempts": ' + att(s) + ' },';
+      if (l.dyn === 'score') v = (s < 28.0 ? '0.61' : (s < 34.1 ? '0.78' : '0.87')) + ',';
+      if (l.dyn === 'passed') v = s >= 34.1 ? 'true' : 'false';
+      var last = l.at; (l.ch || []).forEach(function (c) { if (s >= c) last = c; });
+      var isNew = l.ag !== 'sys' && started && (s - last) < 2.2;
+      if (l.f) fields++;
+      if (l.ind === 1 && l.k) sections++;
+      lines.push({ k: l.k, v: v, pad: l.ind * 18, cls: 'jl' + (isNew ? ' is-new' : '') });
+    });
+    var idx = specIdx(s);
+    var ret = (s >= 22.1 && s < 22.7) || (s >= 28.7 && s < 29.3);
+
+    var shown = SCORES.filter(function (x) { return s >= x.at; });
+    var lastScore = shown.length ? shown[shown.length - 1] : null;
+    var scoreChips = SCORES.map(function (x, i) {
+      var vis = s >= x.at;
+      var cur = lastScore && lastScore.v === x.v;
+      return { v: vis ? x.v : '—', cls: 'sc' + (vis ? (x.n >= 0.85 ? ' pass' : ' fail') : '') + (cur ? ' cur' : ''), arrow: i < 2 ? '→' : '' };
+    });
+    var critWorking = states.critic === 'working';
+    var loopOn = s >= 19.1 && s < 34.8;
+
+    var evs = EV.filter(function (e) { return s >= e.at && (e.ag !== 'user' || answered); }).map(function (e) {
+      var who = e.ag === 'user' ? 'Sen' : findAgent(e.ag).name;
+      var t = e.ag === 'user' ? (skipped ? 'soruyu atladın, "buton" kaldı' : '"' + answer + '" dedin' + (auto ? ' (süre doldu)' : '')) : e.t;
+      return { who: who, t: t, time: clock(realT(e.at)), op: 1 };
+    }).reverse().slice(0, 3);
+    evs.forEach(function (e, i) { e.op = 1 - i * 0.25; });
+
+    var segs = AGENTS.map(function (a) {
+      var tot = totalOf(a.id), acc = Math.max(0, accrued(a.id, s));
+      var cur = started && (states[a.id] === 'working' || states[a.id] === 'asking' || states[a.id] === 'error');
+      var divs = [];
+      if (a.id === 'generator') divs = [{ x: 38.4 }, { x: 71.2 }];
+      if (a.id === 'critic') divs = [{ x: 37.5 }, { x: 68.75 }];
+      var dur = fmt1(acc > 0 ? acc : tot) + ' sn';
+      return { name: a.name, flex: tot, fill: r1(Math.min(100, acc / tot * 100)), wrapCls: 'ag-' + a.id + (cur ? ' is-cur' : ''), divs: divs, dur: dur };
+    });
+    var tlNote = !started ? 'Toplam süre' : (states.reader === 'asking' ? 'Senin cevabını bekliyoruz…' : 'Geçen süre ' + clock(T));
+
+    var pid = st.pid || 'reader';
+    var A = findAgent(pid);
+    var pst = states[pid];
+    var p = {
+      agCls: 'ag-' + pid, name: A.name, quote: A.quote, role: A.role, inp: A.inp, out: A.out, why: A.why,
+      stateLabel: STATE_NAMES[pst], dur: accrued(pid, s) > 0 ? fmt1(accrued(pid, s)) + ' sn' : '—',
+      c: makeChar(pid, pst === 'portrait' ? 'portrait' : pst, 96),
+      isReader: pid === 'reader', isDesigner: pid === 'designer', isGenerator: pid === 'generator', isCritic: pid === 'critic', isNotary: pid === 'notary'
+    };
+    if (pid === 'reader') {
+      var els = [['menü', 0.97], ['başlık', 0.95], ['alt metin', 0.88], ['görsel', 0.93], ['kutu#5', answered ? 0.96 : 0.52], ['kart', 0.90], ['kart', 0.89], ['kart', 0.91], ['alt bilgi', 0.84]];
+      p.els = els.map(function (e, i) { return { n: i === 4 ? (answered ? 'kutu#5 → ' + ansLow : 'kutu#5 · belirsiz') : e[0], c: e[1].toFixed(2), w: Math.round(e[1] * 100), col: (i === 4 && !answered) ? '#E8A21A' : '#F1ECE2' }; });
+      p.answerTxt = answered ? answer + (skipped ? ' (atlandı)' : (auto ? ' (süre doldu)' : '')) : 'bekleniyor';
+    }
+    if (pid === 'generator') {
+      var all = [{ n: 1, lvl: 4, note: '"İlk hali. Biraz aceleye geldi."', dur: '4,0 sn', score: '0.61', at: 17.5 }, { n: 2, lvl: 5, note: '"Hizayı düzelttim, söz."', dur: '3,5 sn', score: '0.78', at: 24.8 }, { n: 3, lvl: 6, note: '"Kontrastı açtım. Bu kesin."', dur: '3,0 sn', score: '0.87', at: 31.1 }];
+      p.attempts = all.filter(function (x) { return s >= x.at; }).map(function (x) { return Object.assign({}, x, { col: x.score === '0.87' ? '#86DDA6' : '#FF9A94' }); });
+      p.noAttempts = p.attempts.length === 0;
+      p.attemptCount = p.attempts.length + ' / 3';
+    }
+    if (pid === 'critic') {
+      var ci = lastScore ? SCORES.indexOf(lastScore) : -1;
+      p.cmpLevel = ci >= 0 ? [4, 5, 6][ci] : Math.max(outLevel(s), 3);
+      p.cmpLabel = ci >= 0 ? 'taslak ' + (ci + 1) : 'taslak';
+      p.crit = (ci >= 0 ? CRIT[ci] : CRIT[0]).map(function (c) { return { n: c[0], v: ci >= 0 ? c[1].toFixed(2) : '—', w: ci >= 0 ? Math.round(c[1] * 100) : 0 }; });
+    }
+    if (pid === 'notary') {
+      p.sealed = s >= END;
+      p.h1 = s >= 36.9 ? '0x9f3a…c21e' : 'henüz yok';
+      p.h2 = s >= 38.2 ? '0x41d7…8b02' : 'henüz yok';
+      p.h3 = s >= END ? '0x7c2e…a913' : 'gönderilmedi';
+    }
+    var tab = st.ptab || 'layout';
+    var lvl = outLevel(s);
+    var genBusy = states.generator === 'working' && ((s < 17.5) || (s >= 22.7 && s < 24.8) || (s >= 29.3 && s < 31.1));
+    var outLbl = OUT_LABELS[lvl];
+    if (lvl === 6 && s >= 34.1) outLbl = 'taslak 3 · onaylı';
+    var askMode = s < ASK_AT ? 'pending' : (answered ? 'answered' : 'asking');
+    var reveal = s < 1.5 ? 0 : Math.min(9, Math.floor((s - 1.5) / 0.4) + 1);
+    var owner = idx === 0 ? 'Okuyucu' : findAgent(AGENTS[idx].id).name;
+    var jopen = !!st.jopen;
+
+    return {
+      rootCls: 's2d' + (motion ? '' : ' no-motion'),
+      clock: clock(T),
+      startLabel: st.run ? 'Baştan al' : (st.fin ? 'Bir daha' : 'Başlat'),
+      start: function () { self.start(); },
+      reset: function () { self.reset(); },
+      stepText: stepText,
+      slots: slots,
+      reveal: reveal, askMode: askMode, answer: answer,
+      foundTxt: reveal > 0 ? reveal + ' öğe · ort. güven 0.89' : 'henüz okunmadı',
+      sketchHashTxt: s >= 36.9 ? '0x9f3a…c21e' : '—',
+      specCls: 'spec' + (started ? '' : ' off') + (ret ? ' ret' : ''),
+      specLeft: r1(SLOT_W * idx + (SLOT_W - 168) / 2),
+      specV: sections, specFields: fields, specOwner: owner,
+      loopCls: 'loop' + (loopOn ? ' on' : '') + (ret || states.critic === 'error' ? ' hot' : ''),
+      scoreChips: scoreChips,
+      scoreBig: critWorking ? '…' : (lastScore ? lastScore.v : '—'),
+      scoreColor: lastScore ? (lastScore.n >= 0.85 ? '#86DDA6' : '#FF9A94') : '#8A8275',
+      events: evs, noEvents: evs.length === 0,
+      showAsk: started && states.reader === 'asking',
+      askHint: mode === 'live' ? (Math.max(0, Math.ceil(ASK_AT + AUTO - T)) + ' sn içinde seçmezsen ben "buton" derim.') : '8 sn içinde seçmezsen ben "buton" derim.',
+      pickButton: function () { self.answerWith('Buton'); },
+      pickImage: function () { self.answerWith('Görsel'); },
+      skipAsk: function () { self.answerWith('Buton', true); },
+      outLevel: lvl, outLabel: outLbl,
+      outWrapCls: 'out-wrap' + (genBusy ? ' busy' : ''),
+      paletteOp: lvl >= 2 ? 1 : 0.25,
+      jsonLines: lines,
+      toggleJson: function () { self.setState({ jopen: !jopen }); },
+      drawerCls: 'drawer' + (jopen ? ' open' : ''), jsonExpanded: String(jopen), jsonHidden: String(!jopen),
+      segs: segs, tlNote: tlNote,
+      panelCls: 'panel' + (st.popen ? ' open' : ''),
+      panelHidden: st.popen ? 'false' : 'true',
+      closePanel: function () { self.setState({ popen: false }); },
+      p: p,
+      tabLayoutCls: 'tab' + (tab === 'layout' ? ' is-on' : ''), tabStyleCls: 'tab' + (tab === 'style' ? ' is-on' : ''), tabContentCls: 'tab' + (tab === 'content' ? ' is-on' : ''),
+      tabLayoutSel: tab === 'layout' ? 'true' : 'false', tabStyleSel: tab === 'style' ? 'true' : 'false', tabContentSel: tab === 'content' ? 'true' : 'false',
+      tabIsLayout: tab === 'layout', tabIsStyle: tab === 'style', tabIsContent: tab === 'content',
+      tabLayout: function () { self.setState({ ptab: 'layout' }); },
+      tabStyle: function () { self.setState({ ptab: 'style' }); },
+      tabContent: function () { self.setState({ ptab: 'content' }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

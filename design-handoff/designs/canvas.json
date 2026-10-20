@@ -1,0 +1,73 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "Landing.dc.html": {
+      "expand": "fill",
+      "h": 3000,
+      "is_interactive": true,
+      "title": "Uygulama · Açılış",
+      "w": 1440,
+      "x": 312,
+      "y": 2147
+    },
+    "Main.dc.html": {
+      "h": 1760,
+      "is_interactive": true,
+      "title": "Ekran 1 · Karakter sayfası",
+      "w": 1920,
+      "x": 1831,
+      "y": 3737
+    },
+    "Output.dc.html": {
+      "h": 520,
+      "title": "Bileşen · Çıkış tasarımı",
+      "w": 300,
+      "x": 2171,
+      "y": 3104
+    },
+    "Scene.dc.html": {
+      "h": 1080,
+      "is_interactive": true,
+      "title": "Ekran 2 · Agent sahnesi",
+      "w": 1920,
+      "x": 2000,
+      "y": 0
+    },
+    "Sketch.dc.html": {
+      "h": 460,
+      "title": "Bileşen · Kroki",
+      "w": 260,
+      "x": 1831,
+      "y": 3104
+    },
+    "Studio.dc.html": {
+      "expand": "fill",
+      "h": 940,
+      "is_interactive": true,
+      "title": "Uygulama · Stüdyo",
+      "w": 1440,
+      "x": 1720,
+      "y": 2051
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-10-18T16:30:00Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {
+    "view": "canvas"
+  },
+  "notes": {},
+  "order": [
+    "Main.dc.html",
+    "Scene.dc.html",
+    "Sketch.dc.html",
+    "Output.dc.html",
+    "Landing.dc.html",
+    "Studio.dc.html"
+  ],
+  "pages": [],
+  "title": "Sketch2Design Agent Sahnesi"
+}

@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Sketch2Design — Agent karakterleri</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&amp;family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0D0E12}
+a{color:#9BC1FF}a:hover{color:#C9DCFF}
+.s2d{--c-reader:#4C8DFF;--c-designer:#FF8A3D;--c-generator:#9B6BFF;--c-critic:#FF4D5E;--c-notary:#2DD4CF;--ink:#0B0B0F}
+.ag-reader{--agent-color:var(--c-reader)}.ag-designer{--agent-color:var(--c-designer)}.ag-generator{--agent-color:var(--c-generator)}.ag-critic{--agent-color:var(--c-critic)}.ag-notary{--agent-color:var(--c-notary)}
+.disp{font-family:'Bricolage Grotesque',system-ui,sans-serif}
+.mono{font-family:'Geist Mono',ui-monospace,monospace}
+.sel-name{color:var(--agent-color)}
+.swatch{background:var(--agent-color)}
+
+.card{appearance:none;font:inherit;color:inherit;cursor:pointer;background:#15171D;border:2px solid rgba(255,255,255,.06);transition:border-color .2s ease,transform .2s ease,box-shadow .2s ease}
+.card:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.16)}
+.card.is-sel{border-color:var(--agent-color);box-shadow:0 0 0 6px color-mix(in srgb,var(--agent-color) 16%,transparent),0 22px 48px -22px var(--agent-color)}
+.card:focus-visible{outline:3px solid #fff;outline-offset:4px}
+
+/* karakter: tek şablon; renk / aksesuar / ifade ayrı katman */
+.ch-svg{--fill:var(--agent-color);overflow:visible;display:block}
+.ch-svg.st-waiting{--fill:color-mix(in srgb,var(--agent-color) 36%,#3B3F4A)}
+.ch-svg.ly-body{--fill:#2B2E37}
+.ch-svg .ol{stroke:var(--ink);stroke-width:5;stroke-linejoin:round}
+.ch-svg .tint{fill:var(--fill)}
+.ch-svg .white{fill:#fff;stroke-width:4}
+.ch-svg .pupil{fill:var(--ink)}
+.ch-svg .glint{fill:#fff}
+.ch-svg .lid{stroke-width:4}
+.ch-svg .happy path{fill:none;stroke:var(--ink);stroke-width:5.5;stroke-linecap:round}
+.ch-svg .brow{fill:none;stroke:var(--ink);stroke-width:5;stroke-linecap:round}
+.ch-svg .mouth{stroke:var(--ink);stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+.ch-svg .m-line{fill:none}
+.ch-svg .m-fill{fill:#3A0F1A}
+.ch-svg .tongue{fill:#FF7A9C;stroke:var(--ink);stroke-width:3.5;stroke-linejoin:round}
+.ch-svg .cheeks ellipse{fill:rgba(255,255,255,.32)}
+.ch-svg .shadow{fill:#000;opacity:.45}
+.ch-svg .antenna{fill:none;stroke:var(--ink);stroke-width:5;stroke-linecap:round}
+.ch-svg .shade{fill:rgba(0,0,0,.16)}
+.ch-svg .shine{fill:none;stroke:rgba(255,255,255,.45);stroke-width:6;stroke-linecap:round}
+.ch-svg .is-hidden{display:none}
+.ch-svg .acc,.ch-svg .particles,.ch-svg .badge{display:none}
+.ag-reader .acc-reader,.ag-designer .acc-designer,.ag-generator .acc-generator,.ag-critic .acc-critic,.ag-notary .acc-notary,.ag-reader.st-asking .acc-qbubble{display:inline}
+.ly-body .acc,.ly-color .acc,.ly-body .face,.ly-color .face{display:none !important}
+.st-waiting .acc{opacity:.55}
+.st-working .particles{display:inline}
+.st-done .badge-done,.st-error .badge-retry{display:inline}
+.pt{fill:var(--agent-color)}.pt-w{fill:#fff}.spark{fill:none;stroke:var(--agent-color);stroke-width:3.5;stroke-linecap:round}
+
+.hop,.squash{transform-box:fill-box;transform-origin:50% 100%}
+.shadow,.eye,.gear,.pt{transform-box:fill-box;transform-origin:50% 50%}
+.eye{transition:transform .25s ease}
+.st-portrait .squash{animation:breathe 3.6s ease-in-out infinite}
+.st-waiting .squash{animation:breathe 3.2s ease-in-out infinite}
+.st-working .hop{animation:hopY .9s ease-in-out infinite}
+.st-working .squash{animation:hopSquash .9s ease-in-out infinite}
+.st-working .shadow{animation:shadowHop .9s ease-in-out infinite}
+.st-working .gear{animation:spin 3s linear infinite}
+.st-working .p1{animation:floatUp 1.6s ease-out infinite}
+.st-working .p2{animation:floatUp 1.6s ease-out .4s infinite}
+.st-working .p3{animation:floatUp 1.6s ease-out .8s infinite}
+.st-working .p4{animation:floatUp 1.6s ease-out 1.2s infinite}
+.st-asking .hop{animation:hopHigh .62s ease-in-out infinite}
+.st-asking .squash{animation:hopSquash .62s ease-in-out infinite}
+.st-asking .shadow{animation:shadowHop .62s ease-in-out infinite}
+.st-asking .eye{transform:scale(1.18)}
+.st-done.ch-svg{animation:flash 1.2s ease-out 1 both}
+.st-done .squash{animation:proud 2.4s ease-in-out infinite}
+.st-error .hop{animation:wobble 1.8s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(1,1)}50%{transform:scale(.982,1.035)}}
+@keyframes hopY{0%,15%,85%,100%{transform:translateY(0)}50%{transform:translateY(-16px)}}
+@keyframes hopHigh{0%,12%,88%,100%{transform:translateY(0)}50%{transform:translateY(-26px)}}
+@keyframes hopSquash{0%{transform:scale(1.08,.92)}15%{transform:scale(.94,1.07)}50%{transform:scale(.98,1.03)}80%{transform:scale(1,1)}90%{transform:scale(1.1,.9)}100%{transform:scale(1.08,.92)}}
+@keyframes shadowHop{0%,15%,85%,100%{transform:scale(1);opacity:.45}50%{transform:scale(.72);opacity:.2}}
+@keyframes proud{0%,100%{transform:scale(1,1)}50%{transform:scale(1.02,.98)}}
+@keyframes wobble{0%,70%,100%{transform:rotate(0)}12%{transform:rotate(-6deg)}26%{transform:rotate(5deg)}40%{transform:rotate(-3.5deg)}54%{transform:rotate(2deg)}}
+@keyframes flash{0%{filter:drop-shadow(0 0 0 var(--agent-color))}30%{filter:drop-shadow(0 0 28px var(--agent-color))}100%{filter:drop-shadow(0 0 8px var(--agent-color))}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes floatUp{0%{opacity:0;transform:translateY(8px) scale(.6)}30%{opacity:1}100%{opacity:0;transform:translateY(-22px) scale(1.05)}}
+
+.bubble{position:relative;display:inline-flex;align-items:center;gap:10px;padding:10px 16px;border-radius:14px;font-weight:600;font-size:18px;line-height:1.25;white-space:nowrap;background:#20232C;color:#ECEEF2;border:2px solid var(--agent-color)}
+.bubble::after{content:'';position:absolute;left:50%;bottom:-9px;width:14px;height:14px;background:inherit;border-right:inherit;border-bottom:inherit;border-bottom-right-radius:3px;transform:translateX(-50%) rotate(45deg)}
+.b-wait{background:#1A1D24;color:#A3A9B5;border-color:#3A3E49}
+.b-ask{background:#fff;color:#0B0B0F;border-color:#fff;animation:askPulse 1.24s ease-in-out infinite}
+.b-done{background:#12251A;color:#C9F5D8;border-color:#22C55E}
+.b-err{background:#2A2112;color:#FCE2B0;border-color:#F5A524}
+.dots{display:none;gap:4px}
+.b-work .dots{display:inline-flex}
+.dots i{width:6px;height:6px;border-radius:50%;background:var(--agent-color);animation:dot 1.1s ease-in-out infinite}
+.dots i:nth-child(2){animation-delay:.18s}.dots i:nth-child(3){animation-delay:.36s}
+@keyframes dot{0%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
+@keyframes askPulse{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--agent-color) 70%,transparent)}50%{box-shadow:0 0 0 9px color-mix(in srgb,var(--agent-color) 0%,transparent)}}
+
+.no-motion *,.no-motion *::after{animation:none !important;transition:none !important}
+@media (prefers-reduced-motion:reduce){.s2d *,.s2d *::after{animation:none !important}}
+</style>
+</helmet>
+<div class="{{rootCls}}" style="position: relative; width: 1920px; height: 1760px; overflow: hidden; box-sizing: border-box; padding: 60px 72px; background: #0D0E12; color: #F2F3F5; font-family: 'Geist', system-ui, sans-serif; display: flex; flex-direction: column; gap: 56px">
+
+<svg aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none">
+<defs>
+<pattern id="s2dHex" width="56" height="97" patternUnits="userSpaceOnUse">
+<path d="M28 0 L56 16.2 L56 48.5 L28 64.7 L0 48.5 L0 16.2 Z M28 64.7 L28 97" fill="none" stroke="rgba(255,255,255,0.035)" stroke-width="1.2"></path>
+</pattern>
+</defs>
+<rect width="100%" height="100%" fill="url(#s2dHex)"></rect>
+</svg>
+
+<header style="position: relative; display: flex; justify-content: space-between; align-items: flex-end; gap: 40px">
+<div style="display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: center; gap: 12px">
+<svg aria-hidden="true" width="30" height="30" viewBox="0 0 30 30"><path d="M15 2 L26.3 8.5 L26.3 21.5 L15 28 L3.7 21.5 L3.7 8.5 Z" fill="none" stroke="#F2F3F5" stroke-width="2.4" stroke-linejoin="round"></path><path d="M9 18 Q12 10 15 15 T21 12" fill="none" stroke="#9B6BFF" stroke-width="2.4" stroke-linecap="round"></path></svg>
+<span class="disp" style="font-size: 22px; font-weight: 700; letter-spacing: -0.01em">Sketch2Design</span>
+<span class="mono" style="font-size: 16px; color: #8D93A0; padding: 4px 10px; border: 1px solid rgba(255,255,255,0.12); border-radius: 999px">Ekran 1 · Karakterler</span>
+</div>
+<h1 class="disp" style="margin: 0; font-size: 72px; line-height: 1; font-weight: 800; letter-spacing: -0.025em">Agent karakterleri</h1>
+<p style="margin: 0; font-size: 24px; color: #A3A9B5; max-width: 980px; line-height: 1.4">Tek gövde şablonu, 5 agent, 5 durum. Silüet hep aynı; agent'lar renk, aksesuar ve ifadeyle ayrışır.</p>
+</div>
+<div style="display: flex; gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 4px; padding: 14px 18px; background: #15171D; border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; min-width: 160px">
+<span class="mono" style="font-size: 15px; color: #8D93A0">01</span>
+<span style="font-size: 20px; font-weight: 600">Renk</span>
+<span class="mono" style="font-size: 15px; color: #A3A9B5">--agent-color</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px; padding: 14px 18px; background: #15171D; border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; min-width: 160px">
+<span class="mono" style="font-size: 15px; color: #8D93A0">02</span>
+<span style="font-size: 20px; font-weight: 600">Aksesuar</span>
+<span style="font-size: 16px; color: #A3A9B5">renk körlüğü için</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px; padding: 14px 18px; background: #15171D; border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; min-width: 160px">
+<span class="mono" style="font-size: 15px; color: #8D93A0">03</span>
+<span style="font-size: 20px; font-weight: 600">İfade</span>
+<span style="font-size: 16px; color: #A3A9B5">göz · kaş · ağız</span>
+</div>
+</div>
+</header>
+
+<section style="position: relative; display: flex; flex-direction: column; gap: 22px">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<h2 class="disp" style="margin: 0; font-size: 34px; font-weight: 700"><span class="mono" style="font-size: 18px; color: #8D93A0; font-weight: 400; margin-right: 14px">01</span>Ekip</h2>
+<span style="font-size: 20px; color: #A3A9B5">Bir karaktere tıkla → 5 durumu aşağıda</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 24px">
+<sc-for list="{{agents}}" as="a" hint-placeholder-count="5">
+<button type="button" class="{{a.cardCls}}" aria-pressed="{{a.pressed}}" onClick="{{a.pick}}" style="display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 22px 18px 24px; border-radius: 24px; text-align: center">
+<svg class="ch-svg {{a.c.cls}}" viewBox="0 0 240 250" width="{{a.c.w}}" height="{{a.c.h}}" role="img" aria-label="{{a.c.label}}">
+<ellipse class="shadow" cx="120" cy="228" rx="64" ry="8"></ellipse>
+<g class="hop"><g class="squash">
+<g class="particles"><circle class="pt p1" cx="34" cy="70" r="5"></circle><circle class="pt p2 pt-w" cx="210" cy="104" r="3.5"></circle><circle class="pt p3 pt-w" cx="24" cy="150" r="3.5"></circle><path class="pt p4 spark" d="M214 140 v12 M208 146 h12"></path></g>
+<path class="antenna" d="M120 46 Q112 30 124 19"></path>
+<circle class="tint ol" cx="127" cy="16" r="8"></circle>
+<path class="tint ol" d="M120 40 C146 40 160 72 174 110 C190 152 204 182 199 199 C195 212 178 215 120 215 C62 215 45 212 41 199 C36 182 50 152 66 110 C80 72 94 40 120 40 Z"></path>
+<path class="shade" d="M44 186 C60 200 90 204 120 204 C150 204 180 200 196 186 C201 196 198 204 190 208 C176 213 160 213 120 213 C80 213 64 213 50 208 C42 204 39 196 44 186 Z"></path>
+<path class="shine" d="M80 112 C86 88 96 68 108 56"></path>
+<g class="face">
+<g class="cheeks {{a.c.blushCls}}"><ellipse cx="82" cy="142" rx="10" ry="5.5"></ellipse><ellipse cx="158" cy="142" rx="10" ry="5.5"></ellipse></g>
+<g class="{{a.c.openCls}}">
+<g class="eye"><circle class="white ol" cx="102" cy="118" r="{{a.c.rL}}"></circle><circle class="pupil" cx="{{a.c.pLx}}" cy="{{a.c.pLy}}" r="{{a.c.prL}}"></circle><circle class="glint" cx="{{a.c.gLx}}" cy="{{a.c.gLy}}" r="{{a.c.grL}}"></circle></g>
+<g class="eye"><circle class="white ol" cx="138" cy="118" r="{{a.c.rR}}"></circle><circle class="pupil" cx="{{a.c.pRx}}" cy="{{a.c.pRy}}" r="{{a.c.prR}}"></circle><circle class="glint" cx="{{a.c.gRx}}" cy="{{a.c.gRy}}" r="{{a.c.grR}}"></circle></g>
+<path class="tint ol lid {{a.c.lidCls}}" d="{{a.c.lidL}}"></path>
+<path class="tint ol lid {{a.c.lidCls}}" d="{{a.c.lidR}}"></path>
+</g>
+<g class="happy {{a.c.happyCls}}"><path d="M90 121 Q102 107 114 121"></path><path d="M126 121 Q138 107 150 121"></path></g>
+<path class="brow" d="{{a.c.browL}}"></path>
+<path class="brow" d="{{a.c.browR}}"></path>
+<path class="mouth {{a.c.mouthCls}}" d="{{a.c.mouth}}"></path>
+<path class="tongue {{a.c.tongueCls}}" d="M114 153 Q113 168 122 168 Q131 168 129 154 Z"></path>
+</g>
+<g class="acc acc-reader"><path d="M198 184 L220 210" stroke="#0B0B0F" stroke-width="13" stroke-linecap="round"></path><path d="M198 184 L220 210" stroke="#7A4A26" stroke-width="6" stroke-linecap="round"></path><circle cx="184" cy="166" r="23" fill="rgba(210,232,255,0.38)" stroke="#0B0B0F" stroke-width="6"></circle><circle cx="184" cy="166" r="17.5" fill="none" stroke="#DCE6F5" stroke-width="3"></circle><path d="M172 158 Q176 150 184 149" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round"></path></g>
+<g class="acc acc-qbubble"><path d="M170 72 L160 92 L184 78 Z" fill="#fff" stroke="#0B0B0F" stroke-width="4.5" stroke-linejoin="round"></path><circle cx="192" cy="52" r="27" fill="#fff" stroke="#0B0B0F" stroke-width="5"></circle><path d="M182 46 Q182 35 192 35 Q203 35 203 45 Q203 52 193 56 V61" fill="none" stroke="#0B0B0F" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="193" cy="70" r="3.6" fill="#0B0B0F"></circle></g>
+<g class="acc acc-designer"><g transform="rotate(-22 44 156)"><rect x="33" y="108" width="22" height="96" rx="3" fill="#F2C94C" stroke="#0B0B0F" stroke-width="4"></rect><path d="M33 122 h8 M33 134 h12 M33 146 h8 M33 158 h12 M33 170 h8 M33 182 h12 M33 194 h8" stroke="#0B0B0F" stroke-width="2.5"></path></g><path d="M168 166 C166 146 196 138 212 152 C226 165 218 190 198 190 C188 190 191 179 182 181 C172 183 169 176 168 166 Z" fill="#F3E6D3" stroke="#0B0B0F" stroke-width="4.5" stroke-linejoin="round"></path><circle cx="184" cy="160" r="5" fill="#4C8DFF"></circle><circle cx="199" cy="155" r="5" fill="#FFD23F"></circle><circle cx="210" cy="168" r="5" fill="#3DDC84"></circle><circle cx="203" cy="181" r="5" fill="#FF4D5E"></circle><path d="M78 62 C72 42 102 30 126 31 C152 32 168 46 161 60 C150 69 98 70 78 62 Z" fill="#2E3350" stroke="#0B0B0F" stroke-width="5" stroke-linejoin="round"></path><path d="M92 55 C110 59 140 59 154 53" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="4" stroke-linecap="round"></path></g>
+<g class="acc acc-generator"><g class="gear"><circle cx="46" cy="94" r="21" fill="none" stroke="#0B0B0F" stroke-width="14" stroke-dasharray="7 6.2"></circle><circle cx="46" cy="94" r="21" fill="none" stroke="#C9CED6" stroke-width="8" stroke-dasharray="7 6.2"></circle><circle cx="46" cy="94" r="17" fill="#C9CED6" stroke="#0B0B0F" stroke-width="4"></circle><circle cx="46" cy="94" r="6" fill="#0B0B0F"></circle></g><g transform="rotate(38 198 172)"><rect x="192" y="160" width="13" height="50" rx="6.5" fill="#C9CED6" stroke="#0B0B0F" stroke-width="4"></rect><circle cx="198.5" cy="152" r="14" fill="#C9CED6" stroke="#0B0B0F" stroke-width="4"></circle><rect x="193.5" y="136" width="10" height="13" rx="2" fill="#0B0B0F"></rect></g></g>
+<g class="acc acc-critic"><circle cx="102" cy="118" r="18.5" fill="rgba(255,255,255,0.10)" stroke="#0B0B0F" stroke-width="5"></circle><circle cx="138" cy="118" r="18.5" fill="rgba(255,255,255,0.10)" stroke="#0B0B0F" stroke-width="5"></circle><path d="M116 111 Q120 106 124 111 M83.5 114 L70 107 M156.5 114 L170 107" fill="none" stroke="#0B0B0F" stroke-width="4.5" stroke-linecap="round"></path><g transform="rotate(12 198 178)"><rect x="176" y="150" width="44" height="56" rx="6" fill="#F4F1EA" stroke="#0B0B0F" stroke-width="4.5"></rect><rect x="188" y="143" width="20" height="12" rx="3" fill="#9AA3AE" stroke="#0B0B0F" stroke-width="3.5"></rect><path d="M183 167 l4 4 l8 -9 M183 182 l4 4 l8 -9" fill="none" stroke="#1F9D55" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M184 194 l7 7 M191 194 l-7 7" stroke="#E5484D" stroke-width="3.5" stroke-linecap="round"></path><path d="M200 167 h13 M200 182 h13 M200 197 h10" stroke="#8A919C" stroke-width="3" stroke-linecap="round"></path></g></g>
+<g class="acc acc-notary"><path d="M72 146 Q120 200 168 146" fill="none" stroke="#0B0B0F" stroke-width="8" stroke-linecap="round"></path><path d="M72 146 Q120 200 168 146" fill="none" stroke="#F2C94C" stroke-width="4" stroke-dasharray="7 4" stroke-linecap="round"></path><circle cx="120" cy="180" r="16" fill="#F2C94C" stroke="#0B0B0F" stroke-width="4.5"></circle><path d="M120 172 L126.9 176 L126.9 184 L120 188 L113.1 184 L113.1 176 Z" fill="none" stroke="#0B0B0F" stroke-width="2.8" stroke-linejoin="round"></path></g>
+</g></g>
+<g class="badge badge-done"><circle cx="44" cy="42" r="18" fill="#22C55E" stroke="#0B0B0F" stroke-width="4.5"></circle><path d="M35 42 l6 6 l11 -12" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path></g>
+<g class="badge badge-retry"><circle cx="44" cy="42" r="18" fill="#F5A524" stroke="#0B0B0F" stroke-width="4.5"></circle><path d="M51 39 A8 8 0 1 0 50 48" fill="none" stroke="#0B0B0F" stroke-width="3.6" stroke-linecap="round"></path><path d="M46 33 L52 39 L45 41" fill="none" stroke="#0B0B0F" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"></path></g>
+</svg>
+<span class="mono" style="font-size: 16px; color: #8D93A0">{{a.no}}</span>
+<span class="disp" style="font-size: 32px; font-weight: 800; line-height: 1.05; letter-spacing: -0.015em">{{a.name}}</span>
+<span style="font-size: 19px; color: #B4B9C4; line-height: 1.35; min-height: 52px">{{a.role}}</span>
+<span style="display: flex; align-items: center; gap: 8px; font-size: 18px; color: #D5D8DE"><span class="swatch" style="width: 14px; height: 14px; border-radius: 50%"></span>{{a.acc}}</span>
+<span class="mono" style="font-size: 15px; color: #7E8492">{{a.cssVar}}</span>
+</button>
+</sc-for>
+</div>
+</section>
+
+<section style="position: relative; display: flex; flex-direction: column; gap: 22px">
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 24px">
+<h2 class="disp" style="margin: 0; font-size: 34px; font-weight: 700"><span class="mono" style="font-size: 18px; color: #8D93A0; font-weight: 400; margin-right: 14px">02</span>Durumlar — <span class="{{selCls}}">{{selName}}</span></h2>
+<span style="font-size: 20px; color: #A3A9B5">{{selRole}} · ifade: {{selMood}}</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 20px">
+<sc-for list="{{states}}" as="s" hint-placeholder-count="5">
+<article style="display: flex; flex-direction: column; gap: 18px; padding: 22px 22px 26px; background: #15171D; border: 1px solid rgba(255,255,255,0.07); border-radius: 22px">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<h3 class="disp" style="margin: 0; font-size: 28px; font-weight: 700">{{s.name}}</h3>
+<span class="mono" style="font-size: 15px; color: #7E8492">st-{{s.id}}</span>
+</div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 8px 0 4px; background: #111318; border-radius: 16px">
+<div style="height: 64px; display: flex; align-items: flex-end; justify-content: center">
+<div class="{{s.bubbleCls}}">{{s.bubble}}<span class="dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+</div>
+<svg class="ch-svg {{s.c.cls}}" viewBox="0 0 240 250" width="{{s.c.w}}" height="{{s.c.h}}" role="img" aria-label="{{s.c.label}}">
+<ellipse class="shadow" cx="120" cy="228" rx="64" ry="8"></ellipse>
+<g class="hop"><g class="squash">
+<g class="particles"><circle class="pt p1" cx="34" cy="70" r="5"></circle><circle class="pt p2 pt-w" cx="210" cy="104" r="3.5"></circle><circle class="pt p3 pt-w" cx="24" cy="150" r="3.5"></circle><path class="pt p4 spark" d="M214 140 v12 M208 146 h12"></path></g>
+<path class="antenna" d="M120 46 Q112 30 124 19"></path>
+<circle class="tint ol" cx="127" cy="16" r="8"></circle>
+<path class="tint ol" d="M120 40 C146 40 160 72 174 110 C190 152 204 182 199 199 C195 212 178 215 120 215 C62 215 45 212 41 199 C36 182 50 152 66 110 C80 72 94 40 120 40 Z"></path>
+<path class="shade" d="M44 186 C60 200 90 204 120 204 C150 204 180 200 196 186 C201 196 198 204 190 208 C176 213 160 213 120 213 C80 213 64 213 50 208 C42 204 39 196 44 186 Z"></path>
+<path class="shine" d="M80 112 C86 88 96 68 108 56"></path>
+<g class="face">
+<g class="cheeks {{s.c.blushCls}}"><ellipse cx="82" cy="142" rx="10" ry="5.5"></ellipse><ellipse cx="158" cy="142" rx="10" ry="5.5"></ellipse></g>
+<g class="{{s.c.openCls}}">
+<g class="eye"><circle class="white ol" cx="102" cy="118" r="{{s.c.rL}}"></circle><circle class="pupil" cx="{{s.c.pLx}}" cy="{{s.c.pLy}}" r="{{s.c.prL}}"></circle><circle class="glint" cx="{{s.c.gLx}}" cy="{{s.c.gLy}}" r="{{s.c.grL}}"></circle></g>
+<g class="eye"><circle class="white ol" cx="138" cy="118" r="{{s.c.rR}}"></circle><circle class="pupil" cx="{{s.c.pRx}}" cy="{{s.c.pRy}}" r="{{s.c.prR}}"></circle><circle class="glint" cx="{{s.c.gRx}}" cy="{{s.c.gRy}}" r="{{s.c.grR}}"></circle></g>
+<path class="tint ol lid {{s.c.lidCls}}" d="{{s.c.lidL}}"></path>
+<path class="tint ol lid {{s.c.lidCls}}" d="{{s.c.lidR}}"></path>
+</g>
+<g class="happy {{s.c.happyCls}}"><path d="M90 121 Q102 107 114 121"></path><path d="M126 121 Q138 107 150 121"></path></g>
+<path class="brow" d="{{s.c.browL}}"></path>
+<path class="brow" d="{{s.c.browR}}"></path>
+<path class="mouth {{s.c.mouthCls}}" d="{{s.c.mouth}}"></path>
+<path class="tongue {{s.c.tongueCls}}" d="M114 153 Q113 168 122 168 Q131 168 129 154 Z"></path>
+</g>
+<g class="acc acc-reader"><path d="M198 184 L220 210" stroke="#0B0B0F" stroke-width="13" stroke-linecap="round"></path><path d="M198 184 L220 210" stroke="#7A4A26" stroke-width="6" stroke-linecap="round"></path><circle cx="184" cy="166" r="23" fill="rgba(210,232,255,0.38)" stroke="#0B0B0F" stroke-width="6"></circle><circle cx="184" cy="166" r="17.5" fill="none" stroke="#DCE6F5" stroke-width="3"></circle><path d="M172 158 Q176 150 184 149" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round"></path></g>
+<g class="acc acc-qbubble"><path d="M170 72 L160 92 L184 78 Z" fill="#fff" stroke="#0B0B0F" stroke-width="4.5" stroke-linejoin="round"></path><circle cx="192" cy="52" r="27" fill="#fff" stroke="#0B0B0F" stroke-width="5"></circle><path d="M182 46 Q182 35 192 35 Q203 35 203 45 Q203 52 193 56 V61" fill="none" stroke="#0B0B0F" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="193" cy="70" r="3.6" fill="#0B0B0F"></circle></g>
+<g class="acc acc-designer"><g transform="rotate(-22 44 156)"><rect x="33" y="108" width="22" height="96" rx="3" fill="#F2C94C" stroke="#0B0B0F" stroke-width="4"></rect><path d="M33 122 h8 M33 134 h12 M33 146 h8 M33 158 h12 M33 170 h8 M33 182 h12 M33 194 h8" stroke="#0B0B0F" stroke-width="2.5"></path></g><path d="M168 166 C166 146 196 138 212 152 C226 165 218 190 198 190 C188 190 191 179 182 181 C172 183 169 176 168 166 Z" fill="#F3E6D3" stroke="#0B0B0F" stroke-width="4.5" stroke-linejoin="round"></path><circle cx="184" cy="160" r="5" fill="#4C8DFF"></circle><circle cx="199" cy="155" r="5" fill="#FFD23F"></circle><circle cx="210" cy="168" r="5" fill="#3DDC84"></circle><circle cx="203" cy="181" r="5" fill="#FF4D5E"></circle><path d="M78 62 C72 42 102 30 126 31 C152 32 168 46 161 60 C150 69 98 70 78 62 Z" fill="#2E3350" stroke="#0B0B0F" stroke-width="5" stroke-linejoin="round"></path><path d="M92 55 C110 59 140 59 154 53" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="4" stroke-linecap="round"></path></g>
+<g class="acc acc-generator"><g class="gear"><circle cx="46" cy="94" r="21" fill="none" stroke="#0B0B0F" stroke-width="14" stroke-dasharray="7 6.2"></circle><circle cx="46" cy="94" r="21" fill="none" stroke="#C9CED6" stroke-width="8" stroke-dasharray="7 6.2"></circle><circle cx="46" cy="94" r="17" fill="#C9CED6" stroke="#0B0B0F" stroke-width="4"></circle><circle cx="46" cy="94" r="6" fill="#0B0B0F"></circle></g><g transform="rotate(38 198 172)"><rect x="192" y="160" width="13" height="50" rx="6.5" fill="#C9CED6" stroke="#0B0B0F" stroke-width="4"></rect><circle cx="198.5" cy="152" r="14" fill="#C9CED6" stroke="#0B0B0F" stroke-width="4"></circle><rect x="193.5" y="136" width="10" height="13" rx="2" fill="#0B0B0F"></rect></g></g>
+<g class="acc acc-critic"><circle cx="102" cy="118" r="18.5" fill="rgba(255,255,255,0.10)" stroke="#0B0B0F" stroke-width="5"></circle><circle cx="138" cy="118" r="18.5" fill="rgba(255,255,255,0.10)" stroke="#0B0B0F" stroke-width="5"></circle><path d="M116 111 Q120 106 124 111 M83.5 114 L70 107 M156.5 114 L170 107" fill="none" stroke="#0B0B0F" stroke-width="4.5" stroke-linecap="round"></path><g transform="rotate(12 198 178)"><rect x="176" y="150" width="44" height="56" rx="6" fill="#F4F1EA" stroke="#0B0B0F" stroke-width="4.5"></rect><rect x="188" y="143" width="20" height="12" rx="3" fill="#9AA3AE" stroke="#0B0B0F" stroke-width="3.5"></rect><path d="M183 167 l4 4 l8 -9 M183 182 l4 4 l8 -9" fill="none" stroke="#1F9D55" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M184 194 l7 7 M191 194 l-7 7" stroke="#E5484D" stroke-width="3.5" stroke-linecap="round"></path><path d="M200 167 h13 M200 182 h13 M200 197 h10" stroke="#8A919C" stroke-width="3" stroke-linecap="round"></path></g></g>
+<g class="acc acc-notary"><path d="M72 146 Q120 200 168 146" fill="none" stroke="#0B0B0F" stroke-width="8" stroke-linecap="round"></path><path d="M72 146 Q120 200 168 146" fill="none" stroke="#F2C94C" stroke-width="4" stroke-dasharray="7 4" stroke-linecap="round"></path><circle cx="120" cy="180" r="16" fill="#F2C94C" stroke="#0B0B0F" stroke-width="4.5"></circle><path d="M120 172 L126.9 176 L126.9 184 L120 188 L113.1 184 L113.1 176 Z" fill="none" stroke="#0B0B0F" stroke-width="2.8" stroke-linejoin="round"></path></g>
+</g></g>
+<g class="badge badge-done"><circle cx="44" cy="42" r="18" fill="#22C55E" stroke="#0B0B0F" stroke-width="4.5"></circle><path d="M35 42 l6 6 l11 -12" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path></g>
+<g class="badge badge-retry"><circle cx="44" cy="42" r="18" fill="#F5A524" stroke="#0B0B0F" stroke-width="4.5"></circle><path d="M51 39 A8 8 0 1 0 50 48" fill="none" stroke="#0B0B0F" stroke-width="3.6" stroke-linecap="round"></path><path d="M46 33 L52 39 L45 41" fill="none" stroke="#0B0B0F" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"></path></g>
+</svg>
+</div>
+<ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px">
+<sc-for list="{{s.points}}" as="p" hint-placeholder-count="3">
+<li style="display: flex; align-items: center; gap: 10px; font-size: 18px; color: #C7CBD3; line-height: 1.3"><span class="swatch" style="width: 8px; height: 8px; border-radius: 50%; flex: none"></span>{{p.t}}</li>
+</sc-for>
+</ul>
+</article>
+</sc-for>
+</div>
+</section>
+
+<section style="position: relative; display: flex; flex-direction: column; gap: 22px">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<h2 class="disp" style="margin: 0; font-size: 34px; font-weight: 700"><span class="mono" style="font-size: 18px; color: #8D93A0; font-weight: 400; margin-right: 14px">03</span>Katmanlar</h2>
+<span style="font-size: 20px; color: #A3A9B5">Tek SVG şablonu; her katman ayrı sınıf, kodda bağımsız açılıp kapanır</span>
+</div>
+<div style="display: flex; gap: 20px; align-items: stretch">
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; flex: 1 1 0; min-width: 0">
+<sc-for list="{{layers}}" as="l" hint-placeholder-count="4">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 18px 16px 20px; background: #15171D; border: 1px solid rgba(255,255,255,0.07); border-radius: 20px">
+<svg class="ch-svg {{l.c.cls}}" viewBox="0 0 240 250" width="{{l.c.w}}" height="{{l.c.h}}" role="img" aria-label="{{l.c.label}}">
+<ellipse class="shadow" cx="120" cy="228" rx="64" ry="8"></ellipse>
+<g class="hop"><g class="squash">
+<path class="antenna" d="M120 46 Q112 30 124 19"></path>
+<circle class="tint ol" cx="127" cy="16" r="8"></circle>
+<path class="tint ol" d="M120 40 C146 40 160 72 174 110 C190 152 204 182 199 199 C195 212 178 215 120 215 C62 215 45 212 41 199 C36 182 50 152 66 110 C80 72 94 40 120 40 Z"></path>
+<path class="shade" d="M44 186 C60 200 90 204 120 204 C150 204 180 200 196 186 C201 196 198 204 190 208 C176 213 160 213 120 213 C80 213 64 213 50 208 C42 204 39 196 44 186 Z"></path>
+<path class="shine" d="M80 112 C86 88 96 68 108 56"></path>
+<g class="face">
+<g class="cheeks {{l.c.blushCls}}"><ellipse cx="82" cy="142" rx="10" ry="5.5"></ellipse><ellipse cx="158" cy="142" rx="10" ry="5.5"></ellipse></g>
+<g class="{{l.c.openCls}}">
+<g class="eye"><circle class="white ol" cx="102" cy="118" r="{{l.c.rL}}"></circle><circle class="pupil" cx="{{l.c.pLx}}" cy="{{l.c.pLy}}" r="{{l.c.prL}}"></circle><circle class="glint" cx="{{l.c.gLx}}" cy="{{l.c.gLy}}" r="{{l.c.grL}}"></circle></g>
+<g class="eye"><circle class="white ol" cx="138" cy="118" r="{{l.c.rR}}"></circle><circle class="pupil" cx="{{l.c.pRx}}" cy="{{l.c.pRy}}" r="{{l.c.prR}}"></circle><circle class="glint" cx="{{l.c.gRx}}" cy="{{l.c.gRy}}" r="{{l.c.grR}}"></circle></g>
+<path class="tint ol lid {{l.c.lidCls}}" d="{{l.c.lidL}}"></path>
+<path class="tint ol lid {{l.c.lidCls}}" d="{{l.c.lidR}}"></path>
+</g>
+<g class="happy {{l.c.happyCls}}"><path d="M90 121 Q102 107 114 121"></path><path d="M126 121 Q138 107 150 121"></path></g>
+<path class="brow" d="{{l.c.browL}}"></path>
+<path class="brow" d="{{l.c.browR}}"></path>
+<path class="mouth {{l.c.mouthCls}}" d="{{l.c.mouth}}"></path>
+<path class="tongue {{l.c.tongueCls}}" d="M114 153 Q113 168 122 168 Q131 168 129 154 Z"></path>
+</g>
+<g class="acc acc-reader"><path d="M198 184 L220 210" stroke="#0B0B0F" stroke-width="13" stroke-linecap="round"></path><path d="M198 184 L220 210" stroke="#7A4A26" stroke-width="6" stroke-linecap="round"></path><circle cx="184" cy="166" r="23" fill="rgba(210,232,255,0.38)" stroke="#0B0B0F" stroke-width="6"></circle><circle cx="184" cy="166" r="17.5" fill="none" stroke="#DCE6F5" stroke-width="3"></circle><path d="M172 158 Q176 150 184 149" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round"></path></g>
+<g class="acc acc-designer"><g transform="rotate(-22 44 156)"><rect x="33" y="108" width="22" height="96" rx="3" fill="#F2C94C" stroke="#0B0B0F" stroke-width="4"></rect><path d="M33 122 h8 M33 134 h12 M33 146 h8 M33 158 h12 M33 170 h8 M33 182 h12 M33 194 h8" stroke="#0B0B0F" stroke-width="2.5"></path></g><path d="M168 166 C166 146 196 138 212 152 C226 165 218 190 198 190 C188 190 191 179 182 181 C172 183 169 176 168 166 Z" fill="#F3E6D3" stroke="#0B0B0F" stroke-width="4.5" stroke-linejoin="round"></path><circle cx="184" cy="160" r="5" fill="#4C8DFF"></circle><circle cx="199" cy="155" r="5" fill="#FFD23F"></circle><circle cx="210" cy="168" r="5" fill="#3DDC84"></circle><circle cx="203" cy="181" r="5" fill="#FF4D5E"></circle><path d="M78 62 C72 42 102 30 126 31 C152 32 168 46 161 60 C150 69 98 70 78 62 Z" fill="#2E3350" stroke="#0B0B0F" stroke-width="5" stroke-linejoin="round"></path><path d="M92 55 C110 59 140 59 154 53" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="4" stroke-linecap="round"></path></g>
+<g class="acc acc-generator"><g class="gear"><circle cx="46" cy="94" r="21" fill="none" stroke="#0B0B0F" stroke-width="14" stroke-dasharray="7 6.2"></circle><circle cx="46" cy="94" r="21" fill="none" stroke="#C9CED6" stroke-width="8" stroke-dasharray="7 6.2"></circle><circle cx="46" cy="94" r="17" fill="#C9CED6" stroke="#0B0B0F" stroke-width="4"></circle><circle cx="46" cy="94" r="6" fill="#0B0B0F"></circle></g><g transform="rotate(38 198 172)"><rect x="192" y="160" width="13" height="50" rx="6.5" fill="#C9CED6" stroke="#0B0B0F" stroke-width="4"></rect><circle cx="198.5" cy="152" r="14" fill="#C9CED6" stroke="#0B0B0F" stroke-width="4"></circle><rect x="193.5" y="136" width="10" height="13" rx="2" fill="#0B0B0F"></rect></g></g>
+<g class="acc acc-critic"><circle cx="102" cy="118" r="18.5" fill="rgba(255,255,255,0.10)" stroke="#0B0B0F" stroke-width="5"></circle><circle cx="138" cy="118" r="18.5" fill="rgba(255,255,255,0.10)" stroke="#0B0B0F" stroke-width="5"></circle><path d="M116 111 Q120 106 124 111 M83.5 114 L70 107 M156.5 114 L170 107" fill="none" stroke="#0B0B0F" stroke-width="4.5" stroke-linecap="round"></path><g transform="rotate(12 198 178)"><rect x="176" y="150" width="44" height="56" rx="6" fill="#F4F1EA" stroke="#0B0B0F" stroke-width="4.5"></rect><rect x="188" y="143" width="20" height="12" rx="3" fill="#9AA3AE" stroke="#0B0B0F" stroke-width="3.5"></rect><path d="M183 167 l4 4 l8 -9 M183 182 l4 4 l8 -9" fill="none" stroke="#1F9D55" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M184 194 l7 7 M191 194 l-7 7" stroke="#E5484D" stroke-width="3.5" stroke-linecap="round"></path><path d="M200 167 h13 M200 182 h13 M200 197 h10" stroke="#8A919C" stroke-width="3" stroke-linecap="round"></path></g></g>
+<g class="acc acc-notary"><path d="M72 146 Q120 200 168 146" fill="none" stroke="#0B0B0F" stroke-width="8" stroke-linecap="round"></path><path d="M72 146 Q120 200 168 146" fill="none" stroke="#F2C94C" stroke-width="4" stroke-dasharray="7 4" stroke-linecap="round"></path><circle cx="120" cy="180" r="16" fill="#F2C94C" stroke="#0B0B0F" stroke-width="4.5"></circle><path d="M120 172 L126.9 176 L126.9 184 L120 188 L113.1 184 L113.1 176 Z" fill="none" stroke="#0B0B0F" stroke-width="2.8" stroke-linejoin="round"></path></g>
+</g></g>
+</svg>
+<span class="mono" style="font-size: 15px; color: #8D93A0">{{l.no}}</span>
+<span style="font-size: 20px; font-weight: 600">{{l.name}}</span>
+<span class="mono" style="font-size: 15px; color: #A3A9B5">{{l.desc}}</span>
+</div>
+</sc-for>
+</div>
+<pre class="mono" style="margin: 0; flex: 0 0 620px; box-sizing: border-box; padding: 26px 28px; background: #111318; border: 1px solid rgba(255,255,255,0.07); border-radius: 20px; font-size: 17px; line-height: 1.7; color: #C7CBD3; white-space: pre; overflow: hidden">&lt;svg class="ch-svg ag-reader st-working"&gt;
+  &lt;g class="hop"&gt;&lt;g class="squash"&gt;
+    .body + .antenna     gövde · sabit
+    var(--agent-color)   renk katmanı
+    .acc-reader          aksesuar katmanı
+    .face                göz · kaş · ağız
+  &lt;/g&gt;&lt;/g&gt;
+  .badge-done / .badge-retry
+&lt;/svg&gt;
+
+st-  waiting · working · asking · done · error</pre>
+</div>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"defaultAgent":{"editor":"enum","options":["reader","designer","generator","critic","notary"],"default":"reader"},"motion":{"editor":"boolean","default":true},"$preview":{"width":1920,"height":1760}}'>
+var AGENTS = [
+  { id: 'reader', no: '01', name: 'Okuyucu', role: 'Krokideki öğeleri tanır, belirsizse sorar', acc: 'Büyüteç', mood: 'iri, meraklı gözler' },
+  { id: 'designer', no: '02', name: 'Tasarımcı', role: 'Grid, palet, font ve metinleri belirler', acc: 'Bere + palet + cetvel', mood: 'kısık gözlü keyif' },
+  { id: 'generator', no: '03', name: 'Üretici', role: 'Spec’ten tasarımı üretir', acc: 'Dişli + anahtar', mood: 'enerjik, dil dışarıda' },
+  { id: 'critic', no: '04', name: 'Eleştirmen', role: 'Krokiyle kıyaslar, puanlar, geri gönderir', acc: 'Gözlük + liste', mood: 'tek kaş kalkık, şüpheci' },
+  { id: 'notary', no: '05', name: 'Noter', role: 'Kroki ve spec hash’ini Monad’a mühürler', acc: 'Mühürlü zincir kolye', mood: 'gururlu, sakin' }
+];
+
+var O_MOUTH = 'M114 151 a6 7 0 1 0 12 0 a6 7 0 1 0 -12 0';
+
+var FACES = {
+  reader:    { rL: 18, rR: 18, pr: 8, dy: -1, browL: 'M86 92 Q100 84 113 91', browR: 'M127 91 Q140 84 154 92', mouth: O_MOUTH, mFill: true },
+  designer:  { rL: 15, rR: 15, pr: 7, eyes: 'happy', blush: true, browL: 'M90 98 Q101 94 112 98', browR: 'M128 98 Q139 94 150 98', mouth: 'M103 145 Q120 163 137 145' },
+  generator: { rL: 16, rR: 16, pr: 8.5, browL: 'M87 93 L112 88', browR: 'M128 88 L153 93', mouth: 'M103 144 Q120 168 137 144 Z', mFill: true, tongue: true },
+  critic:    { rL: 15, rR: 15, pr: 7, dx: 4, browL: 'M87 100 L113 100', browR: 'M127 89 Q140 80 153 87', mouth: 'M107 153 Q118 151 133 145' },
+  notary:    { rL: 15, rR: 15, pr: 7, dy: -3, lid: 0.25, browL: 'M89 95 Q101 91 112 94', browR: 'M128 94 Q139 91 151 95', mouth: 'M108 148 Q120 157 132 148' }
+};
+
+var STATE_NAMES = { portrait: 'Tanıtım', still: 'Sabit', waiting: 'Bekliyor', working: 'Çalışıyor', asking: 'Soru soruyor', done: 'Bitti', error: 'Tekrar / hata' };
+
+var STATES = [
+  { id: 'waiting', name: 'Bekliyor', kind: 'wait', points: [{ t: 'Soluk renk' }, { t: 'Yavaş nefes alma' }, { t: 'Yarı kapalı gözler' }] },
+  { id: 'working', name: 'Çalışıyor', kind: 'work', points: [{ t: 'Canlı renk, parçacıklar' }, { t: 'Hafif zıplama, squash & stretch' }, { t: 'Canlı durum baloncuğu' }] },
+  { id: 'asking', name: 'Soru soruyor', kind: 'ask', points: [{ t: 'Hızlı, yüksek zıplama' }, { t: 'Büyüyen gözler, kalkık kaşlar' }, { t: 'Baloncukta soru' }] },
+  { id: 'done', name: 'Bitti', kind: 'done', points: [{ t: 'Yeşil tik rozeti' }, { t: 'Kısa parlama' }, { t: 'Mutlu göz ve ağız' }] },
+  { id: 'error', name: 'Tekrar / hata', kind: 'err', points: [{ t: 'Hafif sallanma' }, { t: 'Çatık kaşlar' }, { t: 'Tekrar rozeti' }] }
+];
+
+var BUBBLES = {
+  reader:    { waiting: 'Sırada', working: '9 öğe buldum', asking: 'Bu kutu buton mu?', done: 'Bitti · 5,5 sn', error: 'Okuyamadım, tekrar' },
+  designer:  { waiting: 'Sırada', working: 'Palet seçiliyor', asking: 'Koyu tema mı olsun?', done: 'Bitti · 8,0 sn', error: 'Kontrast düşük' },
+  generator: { waiting: 'Sırada', working: 'Taslak 2 üretiliyor', asking: 'Mobil sürüm de lazım mı?', done: 'Bitti · 3 deneme', error: 'Geri döndü, düzeltiyorum' },
+  critic:    { waiting: 'Sırada', working: 'Krokiyle kıyaslıyorum', asking: 'Skor 0.82, yeterli mi?', done: '0.87 · eşik geçildi', error: '0.61 · geri gönder' },
+  notary:    { waiting: 'Sırada', working: 'specHash hesaplanıyor', asking: "Monad'a yazayım mı?", done: 'Zincire mühürlendi', error: 'İşlem bekliyor, tekrar' }
+};
+
+var LAYERS = [
+  { id: 'body', no: 'A', name: 'Gövde', desc: '.body + .antenna' },
+  { id: 'color', no: 'A + B', name: 'Renk', desc: '--agent-color' },
+  { id: 'acc', no: 'A + B + C', name: 'Aksesuar', desc: '.acc-{id}' },
+  { id: 'all', no: 'A + B + C + D', name: 'İfade', desc: '.face' }
+];
+
+function r1(n) { return Math.round(n * 10) / 10; }
+
+function lidPath(cx, cy, r, frac) {
+  var R = r + 2.5;
+  var h = frac * r;
+  var y = cy - h;
+  var dx = Math.sqrt(Math.max(R * R - h * h, 0));
+  return 'M' + r1(cx - dx) + ' ' + r1(y) + ' A' + R + ' ' + R + ' 0 0 1 ' + r1(cx + dx) + ' ' + r1(y) + ' Z';
+}
+
+function findAgent(id) {
+  for (var i = 0; i < AGENTS.length; i++) { if (AGENTS[i].id === id) return AGENTS[i]; }
+  return AGENTS[0];
+}
+
+function makeChar(id, state, layer, size) {
+  var f = Object.assign({ dx: 0, dy: 0, pr: 7, lid: null, eyes: 'open', mFill: false, tongue: false, blush: false }, FACES[id]);
+  if (state === 'waiting') {
+    f.eyes = 'open'; f.lid = 0; f.dy = 1; f.mouth = 'M112 151 Q120 153 128 151'; f.mFill = false; f.tongue = false; f.blush = false;
+  } else if (state === 'asking') {
+    f.eyes = 'open'; f.lid = null; f.dx = 0; f.dy = -3; f.browL = 'M85 87 Q99 77 113 86'; f.browR = 'M127 86 Q141 77 155 87'; f.mouth = O_MOUTH; f.mFill = true; f.tongue = false;
+  } else if (state === 'done') {
+    f.eyes = 'happy'; f.lid = null; f.browL = 'M90 94 Q101 89 112 94'; f.browR = 'M128 94 Q139 89 150 94'; f.mouth = 'M101 144 Q120 172 139 144 Z'; f.mFill = true; f.tongue = false; f.blush = true;
+  } else if (state === 'error') {
+    f.eyes = 'open'; f.lid = null; f.dx = 0; f.dy = 1; f.browL = 'M88 92 L113 102'; f.browR = 'M127 102 L152 92'; f.mouth = 'M108 157 Q120 146 132 157'; f.mFill = false; f.tongue = false; f.blush = false;
+  }
+  var rL = f.rL, rR = f.rR;
+  var prL = f.prL || f.pr, prR = f.prR || f.pr;
+  var pLx = r1(102 + f.dx * rL / 15), pLy = r1(118 + f.dy * rL / 15);
+  var pRx = r1(138 + f.dx * rR / 15), pRy = r1(118 + f.dy * rR / 15);
+  var hasLid = f.lid !== null && f.lid !== undefined;
+  var a = findAgent(id);
+  return {
+    cls: 'ag-' + id + ' st-' + state + ' ly-' + layer,
+    w: size,
+    h: Math.round(size * 250 / 240),
+    label: a.name + ' — ' + (STATE_NAMES[state] || state),
+    rL: rL, rR: rR, prL: prL, prR: prR,
+    pLx: pLx, pLy: pLy, pRx: pRx, pRy: pRy,
+    gLx: r1(pLx + prL * 0.38), gLy: r1(pLy - prL * 0.42), grL: r1(Math.max(prL * 0.32, 2)),
+    gRx: r1(pRx + prR * 0.38), gRy: r1(pRy - prR * 0.42), grR: r1(Math.max(prR * 0.32, 2)),
+    openCls: f.eyes === 'open' ? 'eyes' : 'eyes is-hidden',
+    happyCls: f.eyes === 'happy' ? '' : 'is-hidden',
+    lidCls: hasLid ? '' : 'is-hidden',
+    lidL: hasLid ? lidPath(102, 118, rL, f.lid) : 'M0 0',
+    lidR: hasLid ? lidPath(138, 118, rR, f.lid) : 'M0 0',
+    browL: f.browL, browR: f.browR,
+    mouth: f.mouth,
+    mouthCls: f.mFill ? 'm-fill' : 'm-line',
+    tongueCls: f.tongue ? '' : 'is-hidden',
+    blushCls: f.blush ? '' : 'is-hidden'
+  };
+}
+
+class Component extends DCLogic {
+  renderVals() {
+    var self = this;
+    var sel = (this.state && this.state.sel) || this.props.defaultAgent || 'reader';
+    var motion = this.props.motion ?? true;
+    var A = findAgent(sel);
+    var agents = AGENTS.map(function (a) {
+      return Object.assign({}, a, {
+        cardCls: 'card ag-' + a.id + (a.id === sel ? ' is-sel' : ''),
+        pressed: a.id === sel ? 'true' : 'false',
+        cssVar: '--c-' + a.id,
+        pick: function () { self.setState({ sel: a.id }); },
+        c: makeChar(a.id, 'portrait', 'all', 214)
+      });
+    });
+    var states = STATES.map(function (s) {
+      return Object.assign({}, s, {
+        c: makeChar(sel, s.id, 'all', 214),
+        bubble: BUBBLES[sel][s.id],
+        bubbleCls: 'bubble b-' + s.kind + ' ag-' + sel
+      });
+    });
+    var layers = LAYERS.map(function (l) {
+      return Object.assign({}, l, { c: makeChar(sel, 'still', l.id, 128) });
+    });
+    return {
+      rootCls: 's2d ag-' + sel + (motion ? '' : ' no-motion'),
+      agents: agents,
+      states: states,
+      layers: layers,
+      selCls: 'sel-name ag-' + sel,
+      selName: A.name,
+      selRole: A.role,
+      selMood: A.mood
+    };
+  }
+}
+</script>
+</body>
+</html>
