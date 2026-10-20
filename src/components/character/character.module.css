@@ -1,0 +1,83 @@
+.ch {
+  --fill: var(--agent-color);
+  overflow: visible;
+  display: block;
+}
+.ch[data-state="waiting"] {
+  --fill: color-mix(in srgb, var(--agent-color) 34%, var(--surface-3));
+}
+
+.ol { stroke: var(--ink); stroke-width: 5; stroke-linejoin: round; }
+.tint { fill: var(--fill); transition: fill 0.4s ease; }
+.white { fill: #fff; stroke-width: 4; }
+.pupil { fill: var(--ink); }
+.glint { fill: #fff; }
+.lid { stroke-width: 4; }
+.happy path { fill: none; stroke: var(--ink); stroke-width: 5.5; stroke-linecap: round; }
+.brow { fill: none; stroke: var(--ink); stroke-width: 5; stroke-linecap: round; }
+.mouth { stroke: var(--ink); stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+.mLine { fill: none; }
+.mFill { fill: #3A0F1A; }
+.tongue { fill: #FF7A9C; stroke: var(--ink); stroke-width: 3.5; stroke-linejoin: round; }
+.cheeks ellipse { fill: rgba(255, 255, 255, 0.32); }
+.shadow { fill: #000; opacity: 0.5; }
+.antenna { fill: none; stroke: var(--ink); stroke-width: 5; stroke-linecap: round; }
+.shade { fill: rgba(0, 0, 0, 0.16); }
+.shine { fill: none; stroke: rgba(255, 255, 255, 0.45); stroke-width: 6; stroke-linecap: round; }
+
+.acc, .particles, .badge { display: none; }
+.ch[data-agent="reader"] .accReader,
+.ch[data-agent="designer"] .accDesigner,
+.ch[data-agent="generator"] .accGenerator,
+.ch[data-agent="critic"] .accCritic,
+.ch[data-agent="notary"] .accNotary,
+.ch[data-agent="reader"][data-state="asking"] .accQbubble { display: inline; }
+.ch[data-state="waiting"] .acc { opacity: 0.55; }
+.ch[data-state="working"] .particles { display: inline; }
+.ch[data-state="done"] .badgeDone,
+.ch[data-state="error"] .badgeRetry { display: inline; }
+
+.pt { fill: var(--agent-color); }
+.ptW { fill: #fff; }
+.spark { fill: none; stroke: var(--agent-color); stroke-width: 3.5; stroke-linecap: round; }
+
+.hop, .squash { transform-box: fill-box; transform-origin: 50% 100%; }
+.shadow, .eye, .gear, .pt { transform-box: fill-box; transform-origin: 50% 50%; }
+.eye { transition: transform 0.25s ease; }
+
+/* portrait */
+.ch[data-state="portrait"] .squash { animation: breathe 3.6s ease-in-out infinite; }
+/* waiting */
+.ch[data-state="waiting"] .squash { animation: breathe 3.2s ease-in-out infinite; }
+/* working */
+.ch[data-state="working"] .hop { animation: hopY 0.9s ease-in-out infinite; }
+.ch[data-state="working"] .squash { animation: hopSquash 0.9s ease-in-out infinite; }
+.ch[data-state="working"] .shadow { animation: shadowHop 0.9s ease-in-out infinite; }
+.ch[data-state="working"] .gear { animation: spin 3s linear infinite; }
+.ch[data-state="working"] .p1 { animation: floatUp 1.6s ease-out infinite; }
+.ch[data-state="working"] .p2 { animation: floatUp 1.6s ease-out 0.4s infinite; }
+.ch[data-state="working"] .p3 { animation: floatUp 1.6s ease-out 0.8s infinite; }
+.ch[data-state="working"] .p4 { animation: floatUp 1.6s ease-out 1.2s infinite; }
+/* asking */
+.ch[data-state="asking"] .hop { animation: hopHigh 0.62s ease-in-out infinite; }
+.ch[data-state="asking"] .squash { animation: hopSquash 0.62s ease-in-out infinite; }
+.ch[data-state="asking"] .shadow { animation: shadowHop 0.62s ease-in-out infinite; }
+.ch[data-state="asking"] .eye { transform: scale(1.18); }
+/* done */
+.ch[data-state="done"] .squash { animation: proud 2.4s ease-in-out infinite; }
+/* error */
+.ch[data-state="error"] .hop { animation: wobble 1.8s ease-in-out infinite; }
+
+@keyframes breathe { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(0.982, 1.035); } }
+@keyframes hopY { 0%, 15%, 85%, 100% { transform: translateY(0); } 50% { transform: translateY(-16px); } }
+@keyframes hopHigh { 0%, 12%, 88%, 100% { transform: translateY(0); } 50% { transform: translateY(-26px); } }
+@keyframes hopSquash { 0% { transform: scale(1.08, 0.92); } 15% { transform: scale(0.94, 1.07); } 50% { transform: scale(0.98, 1.03); } 80% { transform: scale(1, 1); } 90% { transform: scale(1.1, 0.9); } 100% { transform: scale(1.08, 0.92); } }
+@keyframes shadowHop { 0%, 15%, 85%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(0.72); opacity: 0.22; } }
+@keyframes proud { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(1.02, 0.98); } }
+@keyframes wobble { 0%, 70%, 100% { transform: rotate(0); } 12% { transform: rotate(-6deg); } 26% { transform: rotate(5deg); } 40% { transform: rotate(-3.5deg); } 54% { transform: rotate(2deg); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes floatUp { 0% { opacity: 0; transform: translateY(8px) scale(0.6); } 30% { opacity: 1; } 100% { opacity: 0; transform: translateY(-22px) scale(1.05); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .ch, .ch * { animation: none !important; }
+}
