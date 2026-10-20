@@ -1,0 +1,27 @@
+.row { position: relative; height: 70px; }
+
+.spec {
+  position: absolute;
+  top: 0;
+  width: 168px;
+  box-sizing: border-box;
+  padding: 8px 12px 9px;
+  border-radius: 6px;
+  background: var(--surface-2);
+  border: 1px solid var(--line-strong);
+  transition: left 0.7s cubic-bezier(0.6, 0, 0.2, 1), opacity 0.3s ease, transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.ret { transform: rotate(-3deg); border-color: var(--danger); }
+.off { opacity: 0; }
+
+.head { display: flex; justify-content: space-between; align-items: baseline; }
+.title { font-size: 16px; font-weight: 600; }
+.ver { font-family: var(--mono); font-size: 15px; color: var(--muted); }
+.meta { font-family: var(--mono); font-size: 14px; color: var(--muted); }
+
+@media (prefers-reduced-motion: reduce) {
+  .spec { transition: none; }
+}

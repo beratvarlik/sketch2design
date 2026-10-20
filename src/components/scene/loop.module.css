@@ -1,0 +1,48 @@
+.loop { position: relative; height: 150px; }
+.svg { position: absolute; left: 0; top: 0; overflow: visible; }
+
+.main, .head { fill: none; stroke: var(--line-strong); stroke-width: 3; stroke-linecap: round; }
+.head { stroke-linejoin: round; }
+.on .main, .on .head { stroke: var(--chalk); }
+.hot .main { stroke-dasharray: 10 9; animation: dash 0.5s linear infinite; }
+
+.label {
+  position: absolute;
+  left: 556px;
+  width: 160px;
+  top: 24px;
+  text-align: center;
+  font-family: var(--hand);
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--text);
+  transform: rotate(-3deg);
+  opacity: 0.35;
+  transition: opacity 0.3s ease;
+}
+.on .label { opacity: 1; }
+
+.scores {
+  position: absolute;
+  left: 380px;
+  width: 512px;
+  top: 104px;
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 12px;
+}
+.chipWrap { display: contents; }
+.sc { font-family: var(--mono); font-weight: 500; font-size: 24px; color: var(--faint); }
+.fail { color: var(--danger-text); text-decoration: line-through; text-decoration-thickness: 2px; }
+.pass { color: var(--success-text); }
+.cur { font-size: 30px; font-weight: 600; }
+.arrow { color: var(--faint); font-size: 22px; }
+.threshold { font-size: 17px; color: var(--muted); margin-left: 12px; }
+
+@keyframes dash { to { stroke-dashoffset: -38; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .hot .main { animation: none; }
+  .label { transition: none; }
+}
