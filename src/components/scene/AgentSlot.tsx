@@ -1,5 +1,5 @@
 import Character from "@/components/character/Character";
-import type { SlotView } from "@/lib/scenario";
+import type { SlotView } from "@/lib/sceneView";
 import s from "./slot.module.css";
 
 interface AgentSlotProps {

@@ -1,4 +1,4 @@
-import type { SceneView } from "@/lib/scenario";
+import type { SceneView } from "@/lib/sceneView";
 import s from "./spec.module.css";
 
 export default function SpecCard({ spec }: { spec: SceneView["spec"] }) {

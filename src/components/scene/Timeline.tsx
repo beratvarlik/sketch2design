@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import type { SceneView } from "@/lib/scenario";
+import type { SceneView } from "@/lib/sceneView";
 import s from "./timeline.module.css";
 
 interface TimelineProps {

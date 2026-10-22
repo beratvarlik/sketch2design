@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import type { Answer } from "@/lib/scenario";
+import type { Answer } from "@/lib/sceneView";
 import s from "./question.module.css";
 
 interface QuestionModalProps {

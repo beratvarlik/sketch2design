@@ -1,108 +1,107 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ASK_AT, AUTO, END, IDLE_CLOCK, scriptTime, type Answer, type SceneClock } from "./scenario";
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { AgentEvent, AgentEventSource, Answer } from "./events";
+import { INITIAL_STATE, reduceScene, type SceneState, type ScenarioStatus } from "./sceneState";
 
-// Demo zamanlayıcısı. Dışarıya yalnızca bir `SceneClock` verir; ekranın geri kalanı
-// onu `deriveScene(clock)` ile görünüme çevirir. Gerçek backend bağlanınca bu hook'un
-// yerine SSE/WebSocket olaylarından aynı `SceneClock`'u üreten bir hook gelir.
+// Olay kaynağını (demo ya da gerçek) dinler, olayları sahne durumuna indirger ve
+// gerçek zamanı (T) tutar. Ekran `deriveScene(state, T)` ile çizilir.
 
-export type ScenarioStatus = "idle" | "running" | "finished";
-
-interface Run {
-  status: ScenarioStatus;
-  /** Gerçek geçen süre */
-  T: number;
-  /** Soru cevaplandığındaki gerçek süre */
-  answerAt: number | null;
-  answer: Answer;
-  auto: boolean;
-  skipped: boolean;
-}
-
-const IDLE_RUN: Run = { status: "idle", T: 0, answerAt: null, answer: "Buton", auto: false, skipped: false };
+export type { ScenarioStatus };
 
 export interface Scenario {
   status: ScenarioStatus;
-  clock: SceneClock;
+  state: SceneState;
+  /** Çalışmanın başından beri geçen gerçek süre (sn) */
+  T: number;
   start: () => void;
   reset: () => void;
-  /** Okuyucunun sorusunu cevapla (skipped: "Atla" → varsayılan "Buton"). */
+  /** Okuyucunun sorusunu cevapla (skipped: "Atla" → varsayılan cevap). */
   answer: (value: Answer, skipped?: boolean) => void;
 }
 
-export function useScenario(): Scenario {
-  const [run, setRun] = useState<Run>(IDLE_RUN);
-  const runRef = useRef<Run>(IDLE_RUN);
+export function useScenario(makeSource: () => AgentEventSource): Scenario {
+  const [state, setState] = useState<SceneState>(INITIAL_STATE);
+  const [T, setT] = useState(0);
+  const stateRef = useRef<SceneState>(INITIAL_STATE);
   const t0 = useRef(0);
-  const timer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const tickTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const source = useRef<AgentEventSource | null>(null);
+  const disconnect = useRef<(() => void) | null>(null);
 
-  const apply = useCallback((next: Run) => {
-    runRef.current = next;
-    setRun(next);
+  const elapsed = () => (Date.now() - t0.current) / 1000;
+
+  const teardown = useCallback(() => {
+    if (tickTimer.current) clearInterval(tickTimer.current);
+    tickTimer.current = null;
+    disconnect.current?.();
+    disconnect.current = null;
+    source.current = null;
   }, []);
 
-  const stop = useCallback(() => {
-    if (timer.current) clearInterval(timer.current);
-    timer.current = null;
-  }, []);
-
-  const tick = useCallback(() => {
-    const prev = runRef.current;
-    if (prev.status !== "running") return;
-    const T = (Date.now() - t0.current) / 1000;
-    // Süre dolunca otomatik "Buton"
-    if (prev.answerAt === null && T >= ASK_AT + AUTO) {
-      apply({ ...prev, T, answerAt: T, answer: "Buton", auto: true });
-      return;
-    }
-    if (scriptTime(T, prev.answerAt) >= END + 0.4) {
-      stop();
-      apply({ ...prev, T, status: "finished" });
-      return;
-    }
-    apply({ ...prev, T });
-  }, [apply, stop]);
-
-  const start = useCallback(() => {
-    stop();
-    t0.current = Date.now();
-    apply({ ...IDLE_RUN, status: "running" });
-    timer.current = setInterval(tick, 100);
-  }, [apply, stop, tick]);
-
-  const reset = useCallback(() => {
-    stop();
-    apply(IDLE_RUN);
-  }, [apply, stop]);
-
-  const answer = useCallback(
-    (value: Answer, skipped = false) => {
-      const prev = runRef.current;
-      if (prev.status !== "running" || prev.answerAt !== null) return;
-      const T = (Date.now() - t0.current) / 1000;
-      if (T < ASK_AT) return;
-      apply({ ...prev, T, answerAt: T, answer: value, auto: false, skipped });
+  const dispatch = useCallback(
+    (e: AgentEvent) => {
+      const next = reduceScene(stateRef.current, e);
+      stateRef.current = next;
+      setState(next);
+      if (e.type === "run_finished") {
+        setT(elapsed());
+        teardown();
+      }
     },
-    [apply],
+    [teardown],
   );
 
-  useEffect(() => stop, [stop]);
+  const answer = useCallback(
+    (value: Answer, skipped = false, auto = false) => {
+      const q = stateRef.current.question;
+      if (!q || stateRef.current.status !== "running") return;
+      dispatch({ type: "user_answer", t: q.at + 0.01, answer: value, auto, skipped, waited: elapsed() - q.at });
+      source.current?.respond?.(value, skipped);
+    },
+    [dispatch],
+  );
 
-  const clock = useMemo<SceneClock>(() => {
-    if (run.status === "idle") return IDLE_CLOCK;
-    const answered = run.answerAt !== null;
-    return {
-      s: scriptTime(run.T, run.answerAt),
-      T: run.T,
-      answered,
-      answer: run.answer,
-      auto: run.auto,
-      skipped: run.skipped,
-      wait: answered ? (run.answerAt as number) - ASK_AT : Math.max(0, run.T - ASK_AT),
-      live: true,
+  const tick = useCallback(() => {
+    const T = elapsed();
+    setT(T);
+    // Süre dolunca varsayılan cevap
+    const { question: q, wait } = stateRef.current;
+    if (q && T - (q.at + wait) >= q.timeoutSec) answer(q.defaultAnswer, false, true);
+  }, [answer]);
+
+  const start = useCallback(() => {
+    teardown();
+    stateRef.current = INITIAL_STATE;
+    setState(INITIAL_STATE);
+    setT(0);
+    t0.current = Date.now();
+    const src = makeSource();
+    source.current = src;
+    // Script zamanı: soru bekliyorsa sorunun anında durur, yoksa gerçek zaman − toplam bekleme
+    const scriptNow = () => {
+      const st = stateRef.current;
+      return st.question ? st.question.at : elapsed() - st.wait;
     };
-  }, [run]);
+    disconnect.current = src.connect(dispatch, scriptNow);
+    tickTimer.current = setInterval(tick, 100);
+  }, [teardown, makeSource, dispatch, tick]);
 
-  return { status: run.status, clock, start, reset, answer };
+  const reset = useCallback(() => {
+    teardown();
+    stateRef.current = INITIAL_STATE;
+    setState(INITIAL_STATE);
+    setT(0);
+  }, [teardown]);
+
+  useEffect(() => teardown, [teardown]);
+
+  return {
+    status: state.status,
+    state,
+    T,
+    start,
+    reset,
+    answer: (value, skipped) => answer(value, skipped),
+  };
 }

@@ -6,7 +6,7 @@ import Character from "@/components/character/Character";
 import ScaledOutput from "@/components/output/ScaledOutput";
 import Sketch from "@/components/sketch/Sketch";
 import { EXPLORER_TX_URL } from "@/lib/placeholders";
-import type { AgentDetail, Answer, SceneView, Tone } from "@/lib/scenario";
+import type { AgentDetail, Answer, SceneView, Tone } from "@/lib/sceneView";
 import { PALETTES } from "@/lib/studio";
 import s from "./panel.module.css";
 
