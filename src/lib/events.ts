@@ -145,6 +145,10 @@ export const agentEventSchema = z.discriminatedUnion("type", [
         note: z.string().optional(),
         durationSec: z.number().optional(),
         score: z.number().optional(),
+        /** Üreticinin ürettiği tek dosyalık HTML tasarım (gerçek koşuda) ve piksel boyutu */
+        html: z.string().optional(),
+        width: z.number().int().positive().optional(),
+        height: z.number().int().positive().optional(),
       })
       .optional(),
   }),

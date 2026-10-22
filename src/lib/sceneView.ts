@@ -95,6 +95,10 @@ export interface SceneView {
   showAsk: boolean;
   askHint: string;
   outLevel: number;
+  /** Gerçek koşuda şu anki taslağın HTML'i (yoksa demo önizlemesi çizilir) */
+  outFrame: { html: string; width: number; height: number } | null;
+  /** Gerçek koşuda Tasarımcı'nın seçtiği palet ve font (yoksa demo etiketi) */
+  palette: { colors: string[]; font: string } | null;
   outLabel: string;
   outBusy: boolean;
   paletteDim: boolean;
@@ -111,6 +115,21 @@ function bubbleView(state: SceneState, id: CharacterId): BubbleView {
     ? Array.from({ length: b.step.total }, (_, i): StepDot => (i < b.step!.index ? "done" : i === b.step!.index ? "active" : "idle"))
     : undefined;
   return { show: true, kind: b.kind, text: b.text, steps };
+}
+
+/** Şu anki çıktı seviyesine karşılık gelen gerçek taslak (4–6: o tur, 7: sonuncu). */
+function currentFrame(state: SceneState): SceneView["outFrame"] {
+  const lvl = state.output.level;
+  const drafts = state.drafts.filter((d) => d.html && d.width && d.height);
+  if (lvl < 4 || drafts.length === 0) return null;
+  const d = lvl >= 7 ? drafts[drafts.length - 1] : (drafts.find((x) => x.attempt === lvl - 3) ?? drafts[drafts.length - 1]);
+  return { html: d.html as string, width: d.width as number, height: d.height as number };
+}
+
+function realPalette(state: SceneState): SceneView["palette"] {
+  const colors = state.spec["style.palette"] as string[] | undefined;
+  if (state.elements.length === 0 || !colors?.length) return null;
+  return { colors, font: (state.spec["style.font"] as string | undefined) ?? "" };
 }
 
 export function deriveScene(state: SceneState, T: number): SceneView {
@@ -232,6 +251,8 @@ export function deriveScene(state: SceneState, T: number): SceneView {
     showAsk: started && !!q,
     askHint: `${q ? remaining : AUTO} sn içinde seçmezsen ben "${(q?.defaultAnswer ?? "Buton").toLowerCase()}" derim.`,
     outLevel: state.output.level,
+    outFrame: currentFrame(state),
+    palette: realPalette(state),
     outLabel: state.output.label ?? OUT_LABELS[state.output.level],
     outBusy: state.output.busy,
     paletteDim: state.output.level < 2,
@@ -252,7 +273,21 @@ export interface AgentDetail {
   askedText?: string;
   /** Hatanın gerçek sebebi (varsa) */
   errorText?: string;
-  attempts?: { n: number; lvl: number; note: string; dur: string; score: string; tone: Tone }[];
+  attempts?: { n: number; lvl: number; note: string; dur: string; score: string; tone: Tone; html?: string; size?: [number, number] }[];
+  /** Tasarımcı'nın gerçek spec'i (gerçek koşuda) */
+  designer?: {
+    grid?: string;
+    sections?: string[];
+    notes?: string[];
+    palette?: string[];
+    font?: string;
+    mood?: string;
+    title?: string;
+    subtitle?: string;
+    cta?: string;
+    items?: { heading: string; text: string }[];
+  };
+  cmpHtml?: { html: string; size: [number, number] };
   attemptCount?: string;
   cmpLevel?: number;
   cmpLabel?: string;
@@ -296,6 +331,21 @@ export function deriveAgentDetail(id: CharacterId, state: SceneState, T: number)
     const a = state.answer;
     d.answerText = a ? a.value + (a.skipped ? " (atlandı)" : a.auto ? " (süre doldu)" : "") : "bekleniyor";
   }
+  if (id === "designer" && state.spec["layout.notes"] !== undefined) {
+    const sp = state.spec;
+    d.designer = {
+      grid: sp["layout.grid"] as string | undefined,
+      sections: sp["layout.sections"] as string[] | undefined,
+      notes: sp["layout.notes"] as string[] | undefined,
+      palette: sp["style.palette"] as string[] | undefined,
+      font: sp["style.font"] as string | undefined,
+      mood: sp["style.mood"] as string | undefined,
+      title: sp["content.title"] as string | undefined,
+      subtitle: sp["content.subtitle"] as string | undefined,
+      cta: sp["content.cta"] as string | undefined,
+      items: sp["content.items"] as { heading: string; text: string }[] | undefined,
+    };
+  }
   if (id === "generator") {
     d.attempts = state.drafts
       .filter((x) => x.note !== undefined)
@@ -306,12 +356,16 @@ export function deriveAgentDetail(id: CharacterId, state: SceneState, T: number)
         dur: fmt1(x.durationSec ?? 0) + " sn",
         score: x.score !== undefined ? x.score.toFixed(2) : "—",
         tone: x.score !== undefined && x.score >= SCORE_THRESHOLD ? "pass" : "fail",
+        html: x.html,
+        size: x.width && x.height ? [x.width, x.height] : undefined,
       }));
     d.attemptCount = d.attempts.length + " / 3";
   }
   if (id === "critic") {
     const ci = state.scores.length - 1;
     d.cmpLevel = ci >= 0 ? state.drafts.find((x) => x.attempt === state.scores[ci].attempt)?.level ?? state.output.level : Math.max(state.output.level, 3);
+    const cmpDraft = ci >= 0 ? state.drafts.find((x) => x.attempt === state.scores[ci].attempt && x.html) : undefined;
+    if (cmpDraft?.html && cmpDraft.width && cmpDraft.height) d.cmpHtml = { html: cmpDraft.html, size: [cmpDraft.width, cmpDraft.height] };
     d.cmpLabel = ci >= 0 ? "taslak " + state.scores[ci].attempt : "taslak";
     const crit = ci >= 0 ? state.scores[ci].criteria : [["Yerleşim uyumu", 0], ["Öğe eşleşmesi", 0], ["Hiyerarşi", 0], ["Kontrast", 0]] as [string, number][];
     d.crit = crit.map((c) => ({ n: c[0], v: ci >= 0 ? c[1].toFixed(2) : "—", w: ci >= 0 ? Math.round(c[1] * 100) : 0 }));

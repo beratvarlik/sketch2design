@@ -20,12 +20,12 @@ export interface Item {
 
 export type FormatId = "poster" | "post" | "deck" | "web" | "mobile";
 
-export const FORMATS: { id: FormatId; name: string; ratioLabel: string; r: number; w: number; h: number }[] = [
-  { id: "poster", name: "Afiş", ratioLabel: "3:4", r: 0.75, w: 27, h: 36 },
-  { id: "post", name: "Sosyal medya", ratioLabel: "1:1", r: 1, w: 32, h: 32 },
-  { id: "deck", name: "Sunum", ratioLabel: "16:9", r: 1.7778, w: 42, h: 24 },
-  { id: "web", name: "Web sitesi", ratioLabel: "masaüstü", r: 1.6, w: 40, h: 25 },
-  { id: "mobile", name: "Mobil uygulama", ratioLabel: "9:19.5", r: 0.4615, w: 17, h: 36 },
+export const FORMATS: { id: FormatId; name: string; ratioLabel: string; r: number; w: number; h: number; /** Üretilen HTML tasarımın piksel boyutu */ canvas: [number, number] }[] = [
+  { id: "poster", name: "Afiş", ratioLabel: "3:4", r: 0.75, w: 27, h: 36, canvas: [900, 1200] },
+  { id: "post", name: "Sosyal medya", ratioLabel: "1:1", r: 1, w: 32, h: 32, canvas: [1000, 1000] },
+  { id: "deck", name: "Sunum", ratioLabel: "16:9", r: 1.7778, w: 42, h: 24, canvas: [1280, 720] },
+  { id: "web", name: "Web sitesi", ratioLabel: "masaüstü", r: 1.6, w: 40, h: 25, canvas: [1280, 800] },
+  { id: "mobile", name: "Mobil uygulama", ratioLabel: "9:19.5", r: 0.4615, w: 17, h: 36, canvas: [390, 845] },
 ];
 
 export const PALETTES = [

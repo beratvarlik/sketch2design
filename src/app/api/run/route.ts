@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { runReader } from "@/lib/agents/reader";
 import type { AgentEvent } from "@/lib/events";
-import { LLMError, getModel, type LLMErrorKind, type LLMMeter } from "@/lib/llm";
-import { createRun, type RunSession } from "@/lib/runs";
+import type { LLMMeter } from "@/lib/llm";
+import { runPipeline, type PipelineInput } from "@/lib/pipeline";
+import { createRun } from "@/lib/runs";
 import { FORMATS, PALETTES } from "@/lib/studio";
 
 // Node.js çalışma zamanı (cacheComponents açıkken varsayılan; segment config verilemez)
@@ -18,37 +18,11 @@ const bodySchema = z.object({
   description: z.string().max(80).default(""),
 });
 
-const TIRED = "Biraz yoruldum, birazdan tekrar deneyelim.";
-const FRIENDLY: Record<LLMErrorKind, string> = {
-  rate_limit: TIRED,
-  overloaded: TIRED,
-  network: "Bağlantım koptu, birazdan tekrar deneyelim.",
-  invalid_json: "Notlarım karıştı, bir daha deneyelim.",
-  config: "Anahtarım eksik. .env.local'e GEMINI_API_KEY ekle.",
-  auth: "Anahtarım geçmiyor. .env.local'deki GEMINI_API_KEY'i kontrol et.",
-  not_found: "Model bulunamadı. .env.local'deki GEMINI_MODEL'i kontrol et.",
-  other: TIRED,
-};
-
-/** Hattı çalıştırır; hata olursa Okuyucu'yu hata durumuna sokup çalışmayı bitirir. */
-async function execute(run: RunSession, input: Parameters<typeof runReader>[1]) {
-  const meter: LLMMeter = { requests: 0 };
-  try {
-    await runReader(run, input, meter);
-    // Okuyucu'dan sonrası şimdilik istemcide demo senaryosuyla sürer.
-  } catch (err) {
-    if (run.closed) return;
-    const e = err instanceof LLMError ? err : new LLMError("other", String(err), err);
-    const reason = { kind: e.kind, status: e.status, model: e.model ?? meter.model ?? getModel(), detail: e.message.slice(0, 600) };
-    // Gerçek sebep terminalde tek satırda: tür, HTTP kodu, model ve ham ayrıntı (anahtar maskeli)
-    console.error(
-      `[run ${run.id}] ✖ OKUYUCU BAŞARISIZ | tür=${reason.kind} | http=${reason.status ?? "-"} | model=${reason.model} | istek=${meter.requests} | neden: ${reason.detail.replace(/\s+/g, " ")}`,
-    );
-    run.emit({ type: "agent_error", agent: "reader", message: FRIENDLY[e.kind], reason });
-    run.emit({ type: "run_finished" });
-  } finally {
-    console.info(`[run ${run.id}] model=${meter.model ?? getModel()} istek=${meter.requests}`);
-  }
+/** Kullanıcının seçtiği renkler: özel renkler önce, sonra hazır palet; hiçbiri yoksa null (Tasarımcı seçer). */
+function chosenColors(paletteId: string, custom: string[]): string[] | null {
+  const preset = PALETTES.find((p) => p.id === paletteId)?.c ?? [];
+  const merged = [...custom.map((c) => c.toUpperCase()), ...preset.filter((c) => !custom.includes(c))];
+  return merged.length ? merged : null;
 }
 
 export async function POST(request: Request) {
@@ -63,7 +37,16 @@ export async function POST(request: Request) {
   const body = parsed.data;
 
   const format = FORMATS.find((f) => f.id === body.format)!;
-  const palette = body.palette === "auto" ? "Tasarımcı seçsin" : (PALETTES.find((p) => p.id === body.palette)?.name ?? "Tasarımcı seçsin");
+  const paletteName = body.palette === "auto" ? "Tasarımcı seçsin" : (PALETTES.find((p) => p.id === body.palette)?.name ?? "Tasarımcı seçsin");
+  const input: PipelineInput = {
+    imageBase64: body.image.slice(PNG_PREFIX.length),
+    formatName: format.name,
+    canvas: format.canvas,
+    paletteName,
+    paletteColors: chosenColors(body.palette, body.customColors),
+    description: body.description,
+  };
+
   const run = createRun();
   const encoder = new TextEncoder();
 
@@ -76,13 +59,8 @@ export async function POST(request: Request) {
           // istemci ayrıldı
         }
       };
-      write(`event: run\ndata: ${JSON.stringify({ id: run.id })}\n\n`);
-      run.attach((event: AgentEvent) => {
-        write(`data: ${JSON.stringify(event)}\n\n`);
-        if (event.type === "run_finished") finish();
-      });
-      const keepAlive = setInterval(() => write(": ping\n\n"), 15_000);
       let finished = false;
+      const keepAlive = setInterval(() => write(": ping\n\n"), 15_000);
       const finish = () => {
         if (finished) return;
         finished = true;
@@ -94,17 +72,17 @@ export async function POST(request: Request) {
           // zaten kapalı
         }
       };
+
+      write(`event: run\ndata: ${JSON.stringify({ id: run.id })}\n\n`);
+      run.attach((event: AgentEvent) => {
+        write(`data: ${JSON.stringify(event)}\n\n`);
+        if (event.type === "run_finished") finish();
+      });
       request.signal.addEventListener("abort", finish, { once: true });
 
-      void execute(run, {
-        imageBase64: body.image.slice(PNG_PREFIX.length),
-        formatName: format.name,
-        paletteName: palette,
-        description: body.description,
-      }).then(() => {
-        // Okuyucu bitti (hata olduysa run_finished zaten gönderildi); bağlantıyı kapat.
-        finish();
-      });
+      const meter: LLMMeter = { requests: 0 };
+      // Hat bitince (hata olduysa run_finished zaten gönderildi) bağlantıyı kapat
+      void runPipeline(run, input, meter).then(finish);
     },
     cancel() {
       run.close();

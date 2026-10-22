@@ -6,6 +6,8 @@ import { z } from "zod";
 import { ELEMENT_TYPES, type ElementType, type FoundElement } from "../events";
 import { generateJSON, type LLMMeter } from "../llm";
 import type { RunSession } from "../runs";
+import { READER_SYSTEM } from "./reader.prompt";
+import { sleep } from "./util";
 
 export const CONFIDENCE_THRESHOLD = 0.7;
 export const QUESTION_TIMEOUT_SEC = 8;
@@ -50,9 +52,6 @@ export const readerSchema = z.object({
 });
 
 export type ReaderOutput = z.infer<typeof readerSchema>;
-
-const SYSTEM = `Sen "Okuyucu"sun: Sketch2Design'ın krokileri okuyan agent'ı. Neşeli, kısa konuşan, hafif esprili biri gibi birinci ağızdan Türkçe konuşursun.
-Görevin: kullanıcının elle çizdiği arayüz/tasarım krokisindeki her öğeyi (menü, başlık, metin, buton, görsel, kart, logo, ikon, form, diğer) bulmak.`;
 
 function buildPrompt(input: ReaderInput): string {
   return `Ekteki kroki bir "${input.formatName}" tasarımı için çizildi. Palet tercihi: ${input.paletteName}.${input.description ? ` Kullanıcının tek cümlelik açıklaması: "${input.description}".` : ""}
@@ -106,19 +105,18 @@ export function pickQuestion(elements: FoundElement[], out: ReaderOutput) {
 }
 
 const cap = (s: string) => s.charAt(0).toLocaleUpperCase("tr") + s.slice(1);
-const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
 /**
  * Okuyucu'yu çalıştırır. Başarısız olursa LLMError fırlatır (çağıran agent_error'a çevirir).
- * Başarıyla biterse agent_done(reader) gönderilmiş olur.
+ * Başarıyla biterse agent_done(reader) gönderilmiş olur ve (soruyla netleşmiş) öğe listesi döner.
  */
-export async function runReader(run: RunSession, input: ReaderInput, meter?: LLMMeter): Promise<void> {
+export async function runReader(run: RunSession, input: ReaderInput, meter?: LLMMeter): Promise<FoundElement[]> {
   run.emit({ type: "run_started" });
   run.emit({ type: "agent_started", agent: "reader", log: { agent: "reader", text: "krokiyi aldı" } });
   run.emit({ type: "agent_step", agent: "reader", index: 0, total: 3, label: "Hmm, bu çizgiler ne diyor…" });
 
   const out = await generateJSON({
-    system: SYSTEM,
+    system: READER_SYSTEM,
     prompt: buildPrompt(input),
     images: [{ mimeType: "image/png", data: input.imageBase64 }],
     schema: readerSchema,
@@ -131,16 +129,16 @@ export async function runReader(run: RunSession, input: ReaderInput, meter?: LLM
   run.emit({ type: "spec_patch", path: "source.sketch", value: "kroki.png" });
   run.emit({ type: "agent_step", agent: "reader", index: 1, total: 3, label: out.bubbles.counting });
   run.emit({ type: "elements_found", elements });
-  await sleep(1400);
+  await sleep(run, 1400);
 
   run.emit({ type: "agent_step", agent: "reader", index: 2, total: 3, label: out.bubbles.found });
   run.emit({ type: "spec_patch", path: "source.elements", value: elements.length, log: { agent: "reader", text: `${elements.length} öğe buldu` } });
-  await sleep(1200);
+  await sleep(run, 1200);
 
   const ask = pickQuestion(elements, out);
   if (!ask) {
     run.emit({ type: "agent_done", agent: "reader", final: true, message: out.bubbles.done });
-    return;
+    return elements;
   }
 
   const labels = ask.options.map((o) => o.label);
@@ -161,4 +159,5 @@ export async function runReader(run: RunSession, input: ReaderInput, meter?: LLM
   run.emit({ type: "elements_found", elements });
   run.emit({ type: "spec_patch", path: "source.ambiguous", value: `kutu#${ask.element.id} → ${chosen.label.toLocaleLowerCase("tr")}` });
   run.emit({ type: "agent_done", agent: "reader", final: true, message: `${chosen.label} dedin, not aldım.` });
+  return elements;
 }

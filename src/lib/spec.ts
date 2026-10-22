@@ -13,16 +13,24 @@ export const sourceSchema = z.object({
 export const layoutSchema = z.object({
   grid: z.string(),
   sections: z.array(z.string()),
+  /** Yerleşim kuralları (Üretici'ye yönerge, 3–6 kısa madde) */
+  notes: z.array(z.string()).optional(),
 });
 
 export const styleSchema = z.object({
+  /** Gerçek koşuda sırayla: birincil, vurgu, metin, zemin (hex) */
   palette: z.array(z.string()),
   font: z.string(),
+  /** Tasarımın havası, tek cümle */
+  mood: z.string().optional(),
 });
 
 export const contentSchema = z.object({
   title: z.string(),
   cta: z.string(),
+  subtitle: z.string().optional(),
+  /** Kart / bölüm metinleri */
+  items: z.array(z.object({ heading: z.string(), text: z.string() })).optional(),
 });
 
 export const renderSchema = z.object({
@@ -72,9 +80,9 @@ export type SpecSection = (typeof SPEC_SECTIONS)[number];
 
 export const SPEC_LEAVES = [
   "source.sketch", "source.elements", "source.ambiguous",
-  "layout.grid", "layout.sections",
-  "style.palette", "style.font",
-  "content.title", "content.cta",
+  "layout.grid", "layout.sections", "layout.notes",
+  "style.palette", "style.font", "style.mood",
+  "content.title", "content.cta", "content.subtitle", "content.items",
   "review.score", "review.passed",
   "provenance.sketchHash", "provenance.specHash", "provenance.tx",
 ] as const;

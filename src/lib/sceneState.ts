@@ -50,6 +50,9 @@ export interface DraftEntry {
   note?: string;
   durationSec?: number;
   score?: number;
+  html?: string;
+  width?: number;
+  height?: number;
   at: number;
 }
 

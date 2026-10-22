@@ -201,13 +201,13 @@ export default function RunScene() {
               <span className={s.outLabel}>{view.outLabel}</span>
             </div>
             <div className={`${s.outWrap} ${view.outBusy ? s.busy : ""}`}>
-              <ScaledOutput level={view.outLevel} width={320} radius={8} />
+              <ScaledOutput level={view.outLevel} width={320} radius={8} frame={view.outFrame} />
             </div>
             <div className={s.palette} style={{ opacity: view.paletteDim ? 0.25 : 1 }}>
-              {PALETTES[0].c.map((hex) => (
+              {(view.palette?.colors ?? PALETTES[0].c).map((hex) => (
                 <span key={hex} className={s.sw} style={{ background: hex }} />
               ))}
-              <span className={s.swText}>Bricolage · Geist</span>
+              <span className={s.swText}>{view.palette ? view.palette.font : "Bricolage · Geist"}</span>
             </div>
           </section>
         </main>

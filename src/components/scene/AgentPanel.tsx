@@ -135,17 +135,29 @@ export default function AgentPanel({ detail, open, onClose, askMode, answer, sco
                 <div className={s.readerRow}>
                   <SketchPreview w={250} reveal={0} ask="answered" answer={answer} grid image={sketchImage} />
                   <ul className={s.rules}>
-                    <li>12 sütun, 16px kenar, 6px oluk</li>
-                    <li>4 dikey bölge: menü, hero, buton, kartlar</li>
-                    <li>Kartlar 4&apos;er sütun, eşit</li>
-                    <li>Buton başlıkla aynı sol çizgide</li>
+                    {detail.designer?.notes ? (
+                      <>
+                        {detail.designer.grid && <li>{detail.designer.grid}</li>}
+                        {detail.designer.sections && <li>Bölümler: {detail.designer.sections.join(" → ")}</li>}
+                        {detail.designer.notes.map((n, i) => (
+                          <li key={i}>{n}</li>
+                        ))}
+                      </>
+                    ) : (
+                      <>
+                        <li>12 sütun, 16px kenar, 6px oluk</li>
+                        <li>4 dikey bölge: menü, hero, buton, kartlar</li>
+                        <li>Kartlar 4&apos;er sütun, eşit</li>
+                        <li>Buton başlıkla aynı sol çizgide</li>
+                      </>
+                    )}
                   </ul>
                 </div>
               )}
               {tab === "style" && (
                 <div className={s.col16}>
                   <div className={s.swatches}>
-                    {PALETTES[0].c.map((hex, i) => (
+                    {(detail.designer?.palette ?? PALETTES[0].c).map((hex, i) => (
                       <div key={hex} className={s.swatch}>
                         <span className={s.swatchColor} style={{ background: hex }} />
                         <span className={s.swLabel}>{SWATCH_LABELS[i]}</span>
@@ -154,18 +166,23 @@ export default function AgentPanel({ detail, open, onClose, askMode, answer, sco
                     ))}
                   </div>
                   <div className={s.font}>
-                    <span className={s.fontMain}>Bricolage Grotesque</span>
-                    <span className={s.fontSub}>Geist, gövde ve arayüz için</span>
+                    <span className={s.fontMain}>{detail.designer?.font ?? "Bricolage Grotesque"}</span>
+                    <span className={s.fontSub}>{detail.designer ? "başlık / gövde" : "Geist, gövde ve arayüz için"}</span>
                   </div>
-                  <p className={s.designerNote}>&quot;Krokide başlık el yazısıyla kocaman. Karakterli bir font seçtim, metni de koyu tuttum ki okunsun.&quot;</p>
+                  <p className={s.designerNote}>
+                    &quot;{detail.designer?.mood ?? "Krokide başlık el yazısıyla kocaman. Karakterli bir font seçtim, metni de koyu tuttum ki okunsun."}&quot;
+                  </p>
                 </div>
               )}
               {tab === "content" && (
                 <dl className={s.contentList}>
-                  <div className={s.kv}><dt>Başlık</dt><dd className={s.contentTitle}>Fikrini çiz, tasarımı al.</dd></div>
-                  <div className={s.kv}><dt>Alt metin</dt><dd>Krokiden canlı tasarıma, saniyeler içinde.</dd></div>
-                  <div className={s.kv}><dt>Buton</dt><dd>Hemen dene →</dd></div>
-                  <div className={s.kv}><dt>Kartlar</dt><dd>Çiz · Üret · Mühürle</dd></div>
+                  <div className={s.kv}><dt>Başlık</dt><dd className={s.contentTitle}>{detail.designer?.title ?? "Fikrini çiz, tasarımı al."}</dd></div>
+                  <div className={s.kv}><dt>Alt metin</dt><dd>{detail.designer?.subtitle ?? "Krokiden canlı tasarıma, saniyeler içinde."}</dd></div>
+                  <div className={s.kv}><dt>Buton</dt><dd>{detail.designer?.cta ?? "Hemen dene →"}</dd></div>
+                  <div className={s.kv}>
+                    <dt>Kartlar</dt>
+                    <dd>{detail.designer?.items ? detail.designer.items.map((it) => `${it.heading}: ${it.text}`).join(" · ") || "—" : "Çiz · Üret · Mühürle"}</dd>
+                  </div>
                 </dl>
               )}
             </div>
@@ -178,7 +195,7 @@ export default function AgentPanel({ detail, open, onClose, askMode, answer, sco
             {detail.attempts.length === 0 && <p className={s.emptyNote}>&quot;Henüz bir şey üretmedim, sıra bende değil.&quot;</p>}
             {detail.attempts.map((at) => (
               <div key={at.n} className={s.attempt}>
-                <ScaledOutput level={at.lvl} width={120} />
+                <ScaledOutput level={at.lvl} width={120} frame={at.html && at.size ? { html: at.html, width: at.size[0], height: at.size[1] } : null} />
                 <div className={s.attemptText}>
                   <span className={s.attemptTitle}>Taslak {at.n}</span>
                   <span className={s.attemptNote}>{at.note}</span>
@@ -201,7 +218,7 @@ export default function AgentPanel({ detail, open, onClose, askMode, answer, sco
                 <span className={s.hand24}>kroki</span>
               </div>
               <div className={s.cmpCol}>
-                <ScaledOutput level={detail.cmpLevel ?? 3} width={230} />
+                <ScaledOutput level={detail.cmpLevel ?? 3} width={230} frame={detail.cmpHtml ? { html: detail.cmpHtml.html, width: detail.cmpHtml.size[0], height: detail.cmpHtml.size[1] } : null} />
                 <span className={s.faintLg}>{detail.cmpLabel}</span>
               </div>
             </div>

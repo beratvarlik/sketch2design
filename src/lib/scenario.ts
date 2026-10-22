@@ -14,19 +14,19 @@ const END = 39.6;
 /** run_finished, son olaydan kısa süre sonra gelir (son durumlar ekranda otursun). */
 const FINISH_AT = END + 0.4;
 
-const CRIT: [string, number][][] = [
+export const DEMO_CRIT: [string, number][][] = [
   [["Yerleşim uyumu", 0.52], ["Öğe eşleşmesi", 0.74], ["Hiyerarşi", 0.63], ["Kontrast", 0.55]],
   [["Yerleşim uyumu", 0.86], ["Öğe eşleşmesi", 0.82], ["Hiyerarşi", 0.76], ["Kontrast", 0.68]],
   [["Yerleşim uyumu", 0.90], ["Öğe eşleşmesi", 0.89], ["Hiyerarşi", 0.86], ["Kontrast", 0.83]],
 ];
 
-const DRAFTS = [
+export const DEMO_DRAFTS = [
   { note: '"İlk hali. Biraz aceleye geldi."', durationSec: 4.0, score: 0.61 },
   { note: '"Hizayı düzelttim, söz."', durationSec: 3.5, score: 0.78 },
   { note: '"Kontrastı açtım. Bu kesin."', durationSec: 3.0, score: 0.87 },
 ];
 
-const GEN_LABELS = [
+export const DEMO_GEN_LABELS = [
   ["Kolları sıvadım, parçalar diziliyor", "Taslak 1 çıktı, bak bakalım!"],
   ["Tamam tamam, hizayı düzeltiyorum", "Taslak 2. Şimdi nasıl?"],
   ["Kontrastı açıyorum, son tur", "Taslak 3! Bu sefer olmuştur."],
@@ -96,13 +96,13 @@ function phaseTwo(answer: Answer): AgentEvent[] {
   ];
 
   rounds.forEach((r, i) => {
-    const d = DRAFTS[i];
+    const d = DEMO_DRAFTS[i];
     const last = r.n === 3;
     ev.push(
-      { type: "agent_step", t: r.genStart, agent: "generator", index: 0, total: 2, label: GEN_LABELS[i][0] },
+      { type: "agent_step", t: r.genStart, agent: "generator", index: 0, total: 2, label: DEMO_GEN_LABELS[i][0] },
       { type: "spec_patch", t: r.genStart, path: "render", value: { attempts: r.n } },
       { type: "output_update", t: r.genStart, level: r.n + 2, busy: true },
-      { type: "agent_step", t: r.draftAt, agent: "generator", index: 1, total: 2, label: GEN_LABELS[i][1] },
+      { type: "agent_step", t: r.draftAt, agent: "generator", index: 1, total: 2, label: DEMO_GEN_LABELS[i][1] },
       {
         type: "output_update",
         t: r.draftAt,
@@ -123,7 +123,7 @@ function phaseTwo(answer: Answer): AgentEvent[] {
         attempt: r.n,
         score: d.score,
         passed: d.score >= 0.85,
-        criteria: CRIT[i],
+        criteria: DEMO_CRIT[i],
         log: log("critic", last ? "0.87 verdi, onayladı" : `${d.score.toFixed(2)} verdi, geri yolladı`),
       },
       { type: "spec_patch", t: r.scoreAt, path: "review.score", value: d.score },
@@ -166,18 +166,6 @@ function phaseTwo(answer: Answer): AgentEvent[] {
 
   // Aynı saniyedeki olaylar yazıldığı sırayla kalır (Array.sort kararlı)
   return ev.sort((a, b) => a.t - b.t);
-}
-
-/**
- * Okuyucu'dan sonraki demo olayları (Tasarımcı'dan Noter'e). Zamanlar Okuyucu'nun bittiği
- * ana göre göreli verilir: `t = 0` → Okuyucu bitti. Gerçek Okuyucu'yu demo hattına bağlamak için.
- */
-export function demoAfterReader(): AgentEvent[] {
-  return phaseTwo("Buton")
-    .filter((e) => !(e.type === "agent_done" && e.agent === "reader"))
-    .filter((e) => !(e.type === "agent_bubble" && e.agent === "reader"))
-    .filter((e) => !(e.type === "spec_patch" && e.path === "source.ambiguous"))
-    .map((e) => ({ ...e, t: Math.round((e.t - ASK_AT) * 100) / 100 }));
 }
 
 export function createDemoSource(): AgentEventSource {
