@@ -80,7 +80,7 @@ export interface SceneState {
   patchedAt: Partial<Record<SpecPath, number>>;
   scores: ScoreEntry[];
   drafts: DraftEntry[];
-  output: { level: number; label: string | null; busy: boolean };
+  output: { level: number; label: string | null; busy: boolean; selected: number | null };
   seal: { sketchHash: string; specHash: string; tx: string } | null;
   log: LogEntry[];
 }
@@ -108,7 +108,7 @@ export const INITIAL_STATE: SceneState = {
   patchedAt: {},
   scores: [],
   drafts: [],
-  output: { level: 0, label: null, busy: false },
+  output: { level: 0, label: null, busy: false, selected: null },
   seal: null,
   log: [],
 };
@@ -194,7 +194,7 @@ export function reduceScene(prev: SceneState, e: AgentEvent): SceneState {
     case "output_update":
       s = {
         ...s,
-        output: { level: e.level, label: e.label ?? null, busy: e.busy ?? false },
+        output: { level: e.level, label: e.label ?? null, busy: e.busy ?? false, selected: e.selected ?? s.output.selected },
         drafts: e.draft ? [...s.drafts, { ...e.draft, level: e.level, at: e.t }] : s.drafts,
       };
       break;

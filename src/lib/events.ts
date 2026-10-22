@@ -139,6 +139,8 @@ export const agentEventSchema = z.discriminatedUnion("type", [
     level: z.number().int().min(0).max(7),
     label: z.string().optional(),
     busy: z.boolean().optional(),
+    /** Nihai olarak seçilen taslağın turu (eşik geçilemezse en yüksek skorlu taslak seçilir) */
+    selected: z.number().int().positive().optional(),
     draft: z
       .object({
         attempt: z.number().int().positive(),

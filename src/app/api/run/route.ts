@@ -1,6 +1,6 @@
 import { z } from "zod";
 import type { AgentEvent } from "@/lib/events";
-import type { LLMMeter } from "@/lib/llm";
+import { newMeter } from "@/lib/llm";
 import { runPipeline, type PipelineInput } from "@/lib/pipeline";
 import { createRun } from "@/lib/runs";
 import { FORMATS, PALETTES } from "@/lib/studio";
@@ -80,7 +80,7 @@ export async function POST(request: Request) {
       });
       request.signal.addEventListener("abort", finish, { once: true });
 
-      const meter: LLMMeter = { requests: 0 };
+      const meter = newMeter();
       // Hat bitince (hata olduysa run_finished zaten gönderildi) bağlantıyı kapat
       void runPipeline(run, input, meter).then(finish);
     },

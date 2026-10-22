@@ -122,7 +122,8 @@ function currentFrame(state: SceneState): SceneView["outFrame"] {
   const lvl = state.output.level;
   const drafts = state.drafts.filter((d) => d.html && d.width && d.height);
   if (lvl < 4 || drafts.length === 0) return null;
-  const d = lvl >= 7 ? drafts[drafts.length - 1] : (drafts.find((x) => x.attempt === lvl - 3) ?? drafts[drafts.length - 1]);
+  const chosen = state.output.selected !== null && lvl >= 6 ? drafts.find((x) => x.attempt === state.output.selected) : undefined;
+  const d = chosen ?? (lvl >= 7 ? drafts[drafts.length - 1] : (drafts.find((x) => x.attempt === lvl - 3) ?? drafts[drafts.length - 1]));
   return { html: d.html as string, width: d.width as number, height: d.height as number };
 }
 
@@ -177,7 +178,8 @@ export function deriveScene(state: SceneState, T: number): SceneView {
   const idx = SPEC_ORDER.indexOf(ownerId);
   const returning = states.generator === "error";
 
-  const lastScore = state.scores.length ? state.scores[state.scores.length - 1] : null;
+  const selectedScore = state.output.selected !== null ? state.scores.find((x) => x.attempt === state.output.selected) : undefined;
+  const lastScore = selectedScore ?? (state.scores.length ? state.scores[state.scores.length - 1] : null);
   const scoreChips: ScoreChip[] = [0, 1, 2].map((i) => {
     const sc = state.scores[i];
     return {
@@ -347,6 +349,7 @@ export function deriveAgentDetail(id: CharacterId, state: SceneState, T: number)
     };
   }
   if (id === "generator") {
+    const scoreOf = (x: { attempt: number; score?: number }) => x.score ?? state.scores.find((sc) => sc.attempt === x.attempt)?.score;
     d.attempts = state.drafts
       .filter((x) => x.note !== undefined)
       .map((x): NonNullable<AgentDetail["attempts"]>[number] => ({
@@ -354,15 +357,17 @@ export function deriveAgentDetail(id: CharacterId, state: SceneState, T: number)
         lvl: x.level,
         note: x.note ?? "",
         dur: fmt1(x.durationSec ?? 0) + " sn",
-        score: x.score !== undefined ? x.score.toFixed(2) : "—",
-        tone: x.score !== undefined && x.score >= SCORE_THRESHOLD ? "pass" : "fail",
+        score: scoreOf(x) !== undefined ? (scoreOf(x) as number).toFixed(2) : "—",
+        tone: scoreOf(x) !== undefined && (scoreOf(x) as number) >= SCORE_THRESHOLD ? "pass" : scoreOf(x) !== undefined ? "fail" : "none",
         html: x.html,
         size: x.width && x.height ? [x.width, x.height] : undefined,
       }));
     d.attemptCount = d.attempts.length + " / 3";
   }
   if (id === "critic") {
-    const ci = state.scores.length - 1;
+    // Hüküm verildiyse seçilen taslağın değerlendirmesi, değilse en sonuncusu
+    const selIdx = state.output.selected !== null ? state.scores.findIndex((x) => x.attempt === state.output.selected) : -1;
+    const ci = selIdx >= 0 ? selIdx : state.scores.length - 1;
     d.cmpLevel = ci >= 0 ? state.drafts.find((x) => x.attempt === state.scores[ci].attempt)?.level ?? state.output.level : Math.max(state.output.level, 3);
     const cmpDraft = ci >= 0 ? state.drafts.find((x) => x.attempt === state.scores[ci].attempt && x.html) : undefined;
     if (cmpDraft?.html && cmpDraft.width && cmpDraft.height) d.cmpHtml = { html: cmpDraft.html, size: [cmpDraft.width, cmpDraft.height] };

@@ -53,6 +53,23 @@ export interface LLMMeter {
   requests: number;
   /** Cevabı veren model */
   model?: string;
+  /** Başarılı yanıtların bildirdiği token kullanımı (başarısız istekler sayılmaz) */
+  inputTokens: number;
+  outputTokens: number;
+  /** Düşünme tokenları (modelin iç akıl yürütmesi; çıkış faturasına dahildir) */
+  thoughtTokens: number;
+  totalTokens: number;
+}
+
+export function newMeter(): LLMMeter {
+  return { requests: 0, inputTokens: 0, outputTokens: 0, thoughtTokens: 0, totalTokens: 0 };
+}
+
+export interface LLMUsage {
+  input: number;
+  output: number;
+  thoughts: number;
+  total: number;
 }
 
 interface BaseParams {
@@ -67,7 +84,7 @@ interface BaseParams {
 
 /** generateContent'in kullanılan kısmı; testlerde taklit edilebilir. */
 export interface LLMClient {
-  generate(params: { model: string; system?: string; contents: unknown[]; jsonSchema?: unknown; signal?: AbortSignal; timeoutMs?: number }): Promise<string>;
+  generate(params: { model: string; system?: string; contents: unknown[]; jsonSchema?: unknown; signal?: AbortSignal; timeoutMs?: number }): Promise<string | { text: string; usage?: LLMUsage }>;
 }
 
 const MAX_429_RETRIES = 2;
@@ -113,7 +130,11 @@ const sdkAdapter: LLMClient = {
         httpOptions: { timeout: timeoutMs ?? REQUEST_TIMEOUT_MS },
       },
     });
-    return res.text ?? "";
+    const u = res.usageMetadata;
+    return {
+      text: res.text ?? "",
+      usage: u ? { input: u.promptTokenCount ?? 0, output: u.candidatesTokenCount ?? 0, thoughts: u.thoughtsTokenCount ?? 0, total: u.totalTokenCount ?? 0 } : undefined,
+    };
   },
 };
 
@@ -169,8 +190,18 @@ async function request(p: RequestParams): Promise<{ text: string; modelIndex: nu
       if (p.signal?.aborted) throw new LLMError("other", "istek iptal edildi");
       if (p.meter) p.meter.requests++;
       try {
-        const text = await client.generate({ model, system: p.system, contents: p.contents, jsonSchema: p.jsonSchema, signal: p.signal, timeoutMs: p.timeoutMs });
-        if (p.meter) p.meter.model = model;
+        const res = await client.generate({ model, system: p.system, contents: p.contents, jsonSchema: p.jsonSchema, signal: p.signal, timeoutMs: p.timeoutMs });
+        const text = typeof res === "string" ? res : res.text;
+        if (p.meter) {
+          p.meter.model = model;
+          const u = typeof res === "string" ? undefined : res.usage;
+          if (u) {
+            p.meter.inputTokens += u.input;
+            p.meter.outputTokens += u.output;
+            p.meter.thoughtTokens += u.thoughts;
+            p.meter.totalTokens += u.total;
+          }
+        }
         return { text, modelIndex: m };
       } catch (err) {
         const e = classify(err);

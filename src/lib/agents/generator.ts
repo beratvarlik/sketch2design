@@ -88,7 +88,6 @@ export async function runGenerator(run: RunSession, input: GeneratorInput, meter
       attempt: n,
       note: draft.note,
       durationSec: Math.round(((Date.now() - startedAt) / 1000) * 10) / 10,
-      score: draft.score,
       html,
       width: w,
       height: h,
