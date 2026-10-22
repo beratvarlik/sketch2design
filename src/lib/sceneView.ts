@@ -250,6 +250,8 @@ export interface AgentDetail {
   els?: { n: string; c: string; w: number; tone: Tone }[];
   answerText?: string;
   askedText?: string;
+  /** Hatanın gerçek sebebi (varsa) */
+  errorText?: string;
   attempts?: { n: number; lvl: number; note: string; dur: string; score: string; tone: Tone }[];
   attemptCount?: string;
   cmpLevel?: number;
@@ -267,6 +269,8 @@ export function deriveAgentDetail(id: CharacterId, state: SceneState, T: number)
   const st = state.agents[id].state;
   const acc = accrued(state, id, now);
   const d: AgentDetail = { info, state: st, stateLabel: STATE_NAMES[st], dur: acc > 0 ? fmt1(acc) + " sn" : "—" };
+  const err = state.agents[id].error;
+  if (err) d.errorText = `${err.kind}${err.status ? ` · http ${err.status}` : ""}${err.model ? ` · ${err.model}` : ""} — ${err.detail}`;
   const answered = state.answer !== null;
   const ansLow = state.answer?.value === "Görsel" ? "görsel" : "buton";
 

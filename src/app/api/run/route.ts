@@ -18,12 +18,16 @@ const bodySchema = z.object({
   description: z.string().max(80).default(""),
 });
 
+const TIRED = "Biraz yoruldum, birazdan tekrar deneyelim.";
 const FRIENDLY: Record<LLMErrorKind, string> = {
-  rate_limit: "Biraz yoruldum, birazdan tekrar deneyelim.",
+  rate_limit: TIRED,
+  overloaded: TIRED,
   network: "Bağlantım koptu, birazdan tekrar deneyelim.",
   invalid_json: "Notlarım karıştı, bir daha deneyelim.",
   config: "Anahtarım eksik. .env.local'e GEMINI_API_KEY ekle.",
-  other: "Biraz yoruldum, birazdan tekrar deneyelim.",
+  auth: "Anahtarım geçmiyor. .env.local'deki GEMINI_API_KEY'i kontrol et.",
+  not_found: "Model bulunamadı. .env.local'deki GEMINI_MODEL'i kontrol et.",
+  other: TIRED,
 };
 
 /** Hattı çalıştırır; hata olursa Okuyucu'yu hata durumuna sokup çalışmayı bitirir. */
@@ -35,11 +39,15 @@ async function execute(run: RunSession, input: Parameters<typeof runReader>[1]) 
   } catch (err) {
     if (run.closed) return;
     const e = err instanceof LLMError ? err : new LLMError("other", String(err), err);
-    console.error(`[run ${run.id}] okuyucu hatası (${e.kind}): ${e.message}`);
-    run.emit({ type: "agent_error", agent: "reader", message: FRIENDLY[e.kind] });
+    const reason = { kind: e.kind, status: e.status, model: e.model ?? meter.model ?? getModel(), detail: e.message.slice(0, 600) };
+    // Gerçek sebep terminalde tek satırda: tür, HTTP kodu, model ve ham ayrıntı (anahtar maskeli)
+    console.error(
+      `[run ${run.id}] ✖ OKUYUCU BAŞARISIZ | tür=${reason.kind} | http=${reason.status ?? "-"} | model=${reason.model} | istek=${meter.requests} | neden: ${reason.detail.replace(/\s+/g, " ")}`,
+    );
+    run.emit({ type: "agent_error", agent: "reader", message: FRIENDLY[e.kind], reason });
     run.emit({ type: "run_finished" });
   } finally {
-    console.info(`[run ${run.id}] model=${getModel()} istek=${meter.requests}`);
+    console.info(`[run ${run.id}] model=${meter.model ?? getModel()} istek=${meter.requests}`);
   }
 }
 

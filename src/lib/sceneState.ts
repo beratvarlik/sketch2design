@@ -2,7 +2,7 @@
 // Zamana bağlı her şey (süreler, vurgu, ilerleme) bu durum + güncel zaman ile deriveScene'de hesaplanır.
 
 import type { CharacterId, CharacterState } from "@/components/character/faces";
-import type { AgentEvent, Answer, FoundElement } from "./events";
+import type { AgentEvent, Answer, ErrorReason, FoundElement } from "./events";
 import type { SpecPath } from "./spec";
 
 export type ScenarioStatus = "idle" | "running" | "finished";
@@ -18,6 +18,8 @@ export interface AgentRun {
   /** [başlangıç, bitiş] script saniyesi; bitiş null ise sürüyor */
   intervals: [number, number | null][];
   bubble: Bubble | null;
+  /** Son hatanın gerçek sebebi (agent_error.reason) */
+  error: ErrorReason | null;
 }
 
 export interface AskedQuestion {
@@ -85,7 +87,7 @@ const IDS: CharacterId[] = ["reader", "designer", "generator", "critic", "notary
 function agentsWith(state: CharacterState): Record<CharacterId, AgentRun> {
   const out = {} as Record<CharacterId, AgentRun>;
   IDS.forEach((id) => {
-    out[id] = { state, intervals: [], bubble: null };
+    out[id] = { state, intervals: [], bubble: null, error: null };
   });
   return out;
 }
@@ -155,6 +157,7 @@ export function reduceScene(prev: SceneState, e: AgentEvent): SceneState {
     }
     case "agent_step":
       s = patchAgent(s, e.agent, {
+        error: null,
         state: "working",
         bubble: { kind: "work", text: e.label, step: e.total > 1 ? { index: e.index, total: e.total } : undefined },
       });
@@ -174,7 +177,7 @@ export function reduceScene(prev: SceneState, e: AgentEvent): SceneState {
       break;
     }
     case "agent_error":
-      s = patchAgent(s, e.agent, { state: "error", bubble: e.message ? { kind: "err", text: e.message } : null });
+      s = patchAgent(s, e.agent, { state: "error", bubble: e.message ? { kind: "err", text: e.message } : null, error: e.reason ?? null });
       break;
     case "elements_found":
       s = { ...s, elements: e.elements };

@@ -78,6 +78,12 @@ export default function AgentPanel({ detail, open, onClose, askMode, answer, sco
           <div className={s.kv}><dt>Girdi</dt><dd className={s.mono}>{info.inp}</dd></div>
           <div className={s.kv}><dt>Çıktı</dt><dd className={s.mono}>{info.out}</dd></div>
           <div className={`${s.kv} ${s.full}`}><dt>Neden böyle karar verdi</dt><dd className={s.why}>{info.why}</dd></div>
+          {detail.errorText && (
+            <div className={`${s.kv} ${s.full}`}>
+              <dt>Hata ayrıntısı</dt>
+              <dd className={`${s.mono} ${s.errText}`}>{detail.errorText}</dd>
+            </div>
+          )}
         </dl>
 
         {id === "reader" && detail.els && (

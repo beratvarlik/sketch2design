@@ -31,6 +31,15 @@ export const foundElementSchema = z.object({
 });
 export type FoundElement = z.infer<typeof foundElementSchema>;
 
+/** Hatanın gerçek sebebi: tür (rate_limit, overloaded, auth…), HTTP kodu, model ve ham ayrıntı (anahtar maskeli). */
+export const errorReasonSchema = z.object({
+  kind: z.string(),
+  status: z.number().int().optional(),
+  model: z.string().optional(),
+  detail: z.string(),
+});
+export type ErrorReason = z.infer<typeof errorReasonSchema>;
+
 const base = { t: z.number().nonnegative(), log: logSchema.optional() };
 
 export const agentEventSchema = z.discriminatedUnion("type", [
@@ -98,8 +107,17 @@ export const agentEventSchema = z.discriminatedUnion("type", [
     message: z.string().optional(),
   }),
 
-  /** Agent hata/yeniden deneme durumunda. message varsa balonda gösterilir. */
-  z.object({ type: z.literal("agent_error"), ...base, agent: agentIdSchema, message: z.string().optional() }),
+  /**
+   * Agent hata/yeniden deneme durumunda. message varsa balonda gösterilir (kullanıcıya dönük cümle);
+   * reason hatanın gerçek sebebini taşır (geliştirici için: panelde ve sunucu günlüğünde görünür).
+   */
+  z.object({
+    type: z.literal("agent_error"),
+    ...base,
+    agent: agentIdSchema,
+    message: z.string().optional(),
+    reason: errorReasonSchema.optional(),
+  }),
 
   /** design-spec'e yama: bölüm açılışı (value: {}) ya da alan değeri. */
   z.object({ type: z.literal("spec_patch"), ...base, path: specPathSchema, value: z.unknown() }),

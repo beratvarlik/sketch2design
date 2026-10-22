@@ -51,6 +51,7 @@
 .kv dd { font-size: 18px; }
 .full { grid-column: 1 / -1; }
 .why { font-size: 19px !important; line-height: 1.45; color: var(--chalk); }
+.errText, .kv dd.errText { color: var(--danger-text); overflow-wrap: anywhere; }
 .mono, .kv dd.mono { font-family: var(--mono); font-size: 16px; }
 .hand { font-family: var(--hand); font-size: 26px; color: var(--text); }
 .faint { color: var(--faint); }
