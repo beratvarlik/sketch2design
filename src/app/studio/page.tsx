@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, type ChangeEvent } from "react";
+import { useRouter } from "next/navigation";
+import { useRef, useState, type ChangeEvent } from "react";
 import TopBar from "@/components/layout/TopBar";
 import Canvas, { type Upload } from "@/components/studio/Canvas";
 import SettingsPanel from "@/components/studio/SettingsPanel";
 import Toolbar from "@/components/studio/Toolbar";
+import { renderSketchPng } from "@/lib/sketchImage";
 import { FORMATS, saveBrief, sampleItems, type FormatId, type Item, type Tool } from "@/lib/studio";
 import s from "./studio.module.css";
 
@@ -26,6 +28,8 @@ export default function StudioPage() {
   const [palette, setPalette] = useState("auto");
   const [customColors, setCustomColors] = useState<string[]>([]);
   const [description, setDescription] = useState("");
+  const router = useRouter();
+  const going = useRef(false);
 
   const hasContent = doc.items.length > 0 || !!upload;
   const fmt = FORMATS.find((f) => f.id === format);
@@ -73,9 +77,29 @@ export default function StudioPage() {
     reader.readAsDataURL(file);
   }
 
-  function go() {
-    if (!format) return;
-    saveBrief({ title, format, palette, customColors, description, items: doc.items, upload });
+  // Krokiyi PNG'ye çevirip seçimlerle birlikte /run'a taşır
+  async function go() {
+    if (!fmt || going.current) return;
+    going.current = true;
+    try {
+      const image = await renderSketchPng({ items: doc.items, upload: upload?.dataUrl ?? null, ratio: fmt.r });
+      saveBrief({
+        title,
+        format: fmt.id,
+        palette,
+        customColors,
+        description,
+        items: doc.items,
+        // Fotoğraf zaten `image` içinde; oturum depolamasını şişirmemek için ayrıca saklanmaz
+        upload: upload ? { name: upload.name, dataUrl: null } : null,
+        image,
+      });
+    } catch (err) {
+      console.error("Kroki PNG'ye çevrilemedi", err);
+    } finally {
+      going.current = false;
+    }
+    router.push("/run");
   }
 
   return (

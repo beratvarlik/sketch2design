@@ -2,7 +2,7 @@ import { useId } from "react";
 import s from "./sketch.module.css";
 
 export type SketchAsk = "pending" | "asking" | "answered";
-export type SketchAnswer = "Buton" | "Görsel";
+export type SketchAnswer = string;
 
 interface SketchProps {
   w?: number;

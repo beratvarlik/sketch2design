@@ -129,6 +129,8 @@ export interface StudioBrief {
   description: string;
   items: Item[];
   upload: { name: string; dataUrl: string | null } | null;
+  /** Krokinin PNG hâli (canvas + yüklenen fotoğraf); gerçek agent hattına bu gider. */
+  image: string | null;
 }
 
 export const BRIEF_KEY = "sketch2design:brief";

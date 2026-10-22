@@ -15,7 +15,7 @@ interface SettingsPanelProps {
   description: string;
   onDescription: (d: string) => void;
   hasContent: boolean;
-  onGo: () => void;
+  onGo: () => void | Promise<void>;
 }
 
 const XICON = (size: number) => (
@@ -145,7 +145,11 @@ export default function SettingsPanel({
 
       <section className={`${s.psec} ${s.go}`}>
         {canGo ? (
-          <Link className={`${s.btn} ${s.btnXl}`} href="/run" onClick={onGo} aria-describedby="s2d-why">
+          <Link className={`${s.btn} ${s.btnXl}`} href="/run"
+            onClick={(e) => {
+              e.preventDefault();
+              void onGo();
+            }} aria-describedby="s2d-why">
             Tasarla
             <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
               <path d="M4.6 12.3 Q11 11.6 18.6 12.1 M13.8 7 Q16.6 9.6 19 12.1 Q16.4 14.6 13.9 17.2" />

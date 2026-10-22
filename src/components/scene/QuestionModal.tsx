@@ -5,11 +5,14 @@ import type { Answer } from "@/lib/sceneView";
 import s from "./question.module.css";
 
 interface QuestionModalProps {
+  text: string;
+  options: string[];
+  defaultAnswer: Answer;
   hint: string;
   onAnswer: (value: Answer, skipped?: boolean) => void;
 }
 
-export default function QuestionModal({ hint, onAnswer }: QuestionModalProps) {
+export default function QuestionModal({ text, options, defaultAnswer, hint, onAnswer }: QuestionModalProps) {
   const first = useRef<HTMLButtonElement>(null);
   const card = useRef<HTMLDivElement>(null);
 
@@ -56,19 +59,18 @@ export default function QuestionModal({ hint, onAnswer }: QuestionModalProps) {
             <path className={s.thumbBox} d="M38 46 q7 -8 14 0 t14 0 t14 0 t14 0 t14 0" />
             <rect className={s.thumbFocus} x="8" y="10" width="134" height="70" rx="6" />
           </svg>
-          <p className={s.question}>Bu kutu bir buton mu, görsel mi?</p>
+          <p className={s.question}>{text}</p>
         </div>
         <div className={s.opts}>
-          <button ref={first} type="button" className={s.opt} onClick={() => onAnswer("Buton")}>
-            Buton
-          </button>
-          <button type="button" className={`${s.opt} ${s.alt}`} onClick={() => onAnswer("Görsel")}>
-            Görsel
-          </button>
+          {options.map((opt, i) => (
+            <button key={opt} ref={i === 0 ? first : undefined} type="button" className={`${s.opt} ${i > 0 ? s.alt : ""}`} onClick={() => onAnswer(opt)}>
+              {opt}
+            </button>
+          ))}
         </div>
         <div className={s.foot}>
           <span className={s.hint}>{hint}</span>
-          <button type="button" className={s.skip} onClick={() => onAnswer("Buton", true)}>
+          <button type="button" className={s.skip} onClick={() => onAnswer(defaultAnswer, true)}>
             Atla
           </button>
         </div>

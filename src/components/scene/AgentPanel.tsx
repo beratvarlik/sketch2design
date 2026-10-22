@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import Character from "@/components/character/Character";
 import ScaledOutput from "@/components/output/ScaledOutput";
-import Sketch from "@/components/sketch/Sketch";
+import SketchPreview from "@/components/sketch/SketchPreview";
 import { EXPLORER_TX_URL } from "@/lib/placeholders";
 import type { AgentDetail, Answer, SceneView, Tone } from "@/lib/sceneView";
 import { PALETTES } from "@/lib/studio";
@@ -17,6 +17,9 @@ interface AgentPanelProps {
   askMode: SceneView["askMode"];
   answer: Answer;
   scoreChips: SceneView["scoreChips"];
+  /** Gerçek koşuda kullanıcının krokisi */
+  sketchImage: string | null;
+  elements: SceneView["elements"];
 }
 
 type DesignerTab = "layout" | "style" | "content";
@@ -31,7 +34,7 @@ const SWATCH_LABELS = ["Birincil", "Vurgu", "Metin", "Zemin"];
 
 const toneClass: Record<Tone, string> = { pass: s.pass, fail: s.fail, warn: s.warn, none: "" };
 
-export default function AgentPanel({ detail, open, onClose, askMode, answer, scoreChips }: AgentPanelProps) {
+export default function AgentPanel({ detail, open, onClose, askMode, answer, scoreChips, sketchImage, elements }: AgentPanelProps) {
   const [tab, setTab] = useState<DesignerTab>("layout");
   const { info } = detail;
   const id = info.id;
@@ -81,7 +84,7 @@ export default function AgentPanel({ detail, open, onClose, askMode, answer, sco
           <>
             <div className={s.readerRow}>
               <div className={s.tilt}>
-                <Sketch w={250} reveal={9} ask={askMode} answer={answer} />
+                <SketchPreview w={250} reveal={9} ask={askMode} answer={answer} image={sketchImage} elements={elements} />
               </div>
               <ul className={s.els}>
                 {detail.els.map((el, i) => (
@@ -96,7 +99,7 @@ export default function AgentPanel({ detail, open, onClose, askMode, answer, sco
               </ul>
             </div>
             <p className={s.qa}>
-              <span className={s.faint}>Sorduğu:</span> <span className={s.hand}>Bu kutu bir buton mu, görsel mi?</span>
+              <span className={s.faint}>Sorduğu:</span> <span className={s.hand}>{detail.askedText ?? "Bu kutu bir buton mu, görsel mi?"}</span>
               <br />
               <span className={s.faint}>Cevap:</span> <b>{detail.answerText}</b>
             </p>
@@ -124,7 +127,7 @@ export default function AgentPanel({ detail, open, onClose, askMode, answer, sco
             <div role="tabpanel" id="s2d-tabpanel" aria-labelledby={`s2d-tab-${tab}`}>
               {tab === "layout" && (
                 <div className={s.readerRow}>
-                  <Sketch w={250} reveal={0} ask="answered" answer={answer} grid />
+                  <SketchPreview w={250} reveal={0} ask="answered" answer={answer} grid image={sketchImage} />
                   <ul className={s.rules}>
                     <li>12 sütun, 16px kenar, 6px oluk</li>
                     <li>4 dikey bölge: menü, hero, buton, kartlar</li>
@@ -187,7 +190,7 @@ export default function AgentPanel({ detail, open, onClose, askMode, answer, sco
             <div className={s.cmp}>
               <div className={s.cmpCol}>
                 <div className={s.tilt}>
-                  <Sketch w={230} reveal={0} ask="answered" answer={answer} />
+                  <SketchPreview w={230} reveal={0} ask="answered" answer={answer} image={sketchImage} />
                 </div>
                 <span className={s.hand24}>kroki</span>
               </div>

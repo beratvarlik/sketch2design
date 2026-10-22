@@ -2,7 +2,7 @@
 // Zamana bağlı her şey (süreler, vurgu, ilerleme) bu durum + güncel zaman ile deriveScene'de hesaplanır.
 
 import type { CharacterId, CharacterState } from "@/components/character/faces";
-import type { AgentEvent, Answer } from "./events";
+import type { AgentEvent, Answer, FoundElement } from "./events";
 import type { SpecPath } from "./spec";
 
 export type ScenarioStatus = "idle" | "running" | "finished";
@@ -18,6 +18,11 @@ export interface AgentRun {
   /** [başlangıç, bitiş] script saniyesi; bitiş null ise sürüyor */
   intervals: [number, number | null][];
   bubble: Bubble | null;
+}
+
+export interface AskedQuestion {
+  text: string;
+  options: string[];
 }
 
 export interface QuestionState {
@@ -59,6 +64,10 @@ export interface SceneState {
   /** Spec en son hangi agent'a geçti */
   owner: CharacterId | null;
   question: QuestionState | null;
+  /** Sorulmuş son soru (cevaplandıktan sonra da kalır) */
+  asked: AskedQuestion | null;
+  /** Okuyucunun bulduğu öğeler */
+  elements: FoundElement[];
   answer: { value: Answer; auto: boolean; skipped: boolean } | null;
   /** Sorularda toplam bekleme (gerçek sn) */
   wait: number;
@@ -86,6 +95,8 @@ export const INITIAL_STATE: SceneState = {
   agents: agentsWith("portrait"),
   owner: null,
   question: null,
+  asked: null,
+  elements: [],
   answer: null,
   wait: 0,
   spec: {},
@@ -153,7 +164,7 @@ export function reduceScene(prev: SceneState, e: AgentEvent): SceneState {
       break;
     case "agent_question":
       s = patchAgent(s, e.agent, { state: "asking", bubble: { kind: "ask", text: e.bubble } });
-      s = { ...s, question: { at: e.t, text: e.question, options: e.options, timeoutSec: e.timeoutSec, defaultAnswer: e.defaultAnswer } };
+      s = { ...s, asked: { text: e.question, options: e.options }, question: { at: e.t, text: e.question, options: e.options, timeoutSec: e.timeoutSec, defaultAnswer: e.defaultAnswer } };
       break;
     case "agent_done": {
       s = patchAgent(s, e.agent, {
@@ -164,6 +175,9 @@ export function reduceScene(prev: SceneState, e: AgentEvent): SceneState {
     }
     case "agent_error":
       s = patchAgent(s, e.agent, { state: "error", bubble: e.message ? { kind: "err", text: e.message } : null });
+      break;
+    case "elements_found":
+      s = { ...s, elements: e.elements };
       break;
     case "spec_patch":
       s = { ...s, spec: { ...s.spec, [e.path]: e.value }, patchedAt: { ...s.patchedAt, [e.path]: e.t } };

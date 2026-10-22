@@ -168,6 +168,18 @@ function phaseTwo(answer: Answer): AgentEvent[] {
   return ev.sort((a, b) => a.t - b.t);
 }
 
+/**
+ * Okuyucu'dan sonraki demo olayları (Tasarımcı'dan Noter'e). Zamanlar Okuyucu'nun bittiği
+ * ana göre göreli verilir: `t = 0` → Okuyucu bitti. Gerçek Okuyucu'yu demo hattına bağlamak için.
+ */
+export function demoAfterReader(): AgentEvent[] {
+  return phaseTwo("Buton")
+    .filter((e) => !(e.type === "agent_done" && e.agent === "reader"))
+    .filter((e) => !(e.type === "agent_bubble" && e.agent === "reader"))
+    .filter((e) => !(e.type === "spec_patch" && e.path === "source.ambiguous"))
+    .map((e) => ({ ...e, t: Math.round((e.t - ASK_AT) * 100) / 100 }));
+}
+
 export function createDemoSource(): AgentEventSource {
   let queue: AgentEvent[] = phaseOne();
   let emit: ((e: AgentEvent) => void) | null = null;

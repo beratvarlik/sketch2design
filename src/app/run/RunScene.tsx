@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { CharacterId } from "@/components/character/faces";
 import ScaledOutput from "@/components/output/ScaledOutput";
-import Sketch from "@/components/sketch/Sketch";
+import SketchPreview from "@/components/sketch/SketchPreview";
 import AgentPanel from "@/components/scene/AgentPanel";
 import AgentSlot from "@/components/scene/AgentSlot";
 import JsonDrawer from "@/components/scene/JsonDrawer";
@@ -15,7 +15,7 @@ import SpecCard from "@/components/scene/SpecCard";
 import Timeline from "@/components/scene/Timeline";
 import { createEventSource } from "@/lib/sources";
 import { deriveAgentDetail, deriveScene } from "@/lib/sceneView";
-import { PALETTES } from "@/lib/studio";
+import { BRIEF_KEY, PALETTES, type StudioBrief } from "@/lib/studio";
 import { useScenario } from "@/lib/useScenario";
 import s from "./run.module.css";
 
@@ -43,10 +43,30 @@ function useFit() {
   return { ref, fit };
 }
 
+// Stüdyo'dan gelen seçimler (sessionStorage); sunucuda boş, tarayıcıda dolu
+const subscribeNone = () => () => {};
+function readBriefRaw(): string | null {
+  try {
+    return sessionStorage.getItem(BRIEF_KEY);
+  } catch {
+    return null;
+  }
+}
+
 export default function RunScene() {
-  // ?demo=1 her zaman demo senaryosunu kullanır
+  // ?demo=1 her zaman tamamen demo senaryosunu kullanır
   const demo = useSearchParams().get("demo") === "1";
-  const makeSource = useCallback(() => createEventSource({ demo }), [demo]);
+  const briefRaw = useSyncExternalStore(subscribeNone, readBriefRaw, () => null);
+  const brief = useMemo<StudioBrief | null>(() => {
+    if (!briefRaw) return null;
+    try {
+      return JSON.parse(briefRaw) as StudioBrief;
+    } catch {
+      return null;
+    }
+  }, [briefRaw]);
+  const sketchImage = !demo && brief?.image ? brief.image : null;
+  const makeSource = useCallback(() => createEventSource({ demo, brief }), [demo, brief]);
   const { status, state, T, start, reset, answer } = useScenario(makeSource);
   const view = deriveScene(state, T);
   const { ref, fit } = useFit();
@@ -120,7 +140,7 @@ export default function RunScene() {
               <span className={s.tape} aria-hidden="true" style={{ left: -14, top: -10, width: 74, transform: "rotate(-24deg)" }} />
               <span className={s.tape} aria-hidden="true" style={{ right: -16, top: -6, width: 70, transform: "rotate(18deg)" }} />
               <div className={s.sketchInner}>
-                <Sketch w={296} reveal={view.reveal} ask={view.askMode} answer={view.answer} />
+                <SketchPreview w={296} reveal={view.reveal} ask={view.askMode} answer={view.answer} image={sketchImage} elements={view.elements} />
               </div>
             </div>
             <div className={s.found}>
@@ -195,9 +215,11 @@ export default function RunScene() {
         <JsonDrawer lines={view.jsonLines} fields={view.jsonFields} open={jsonOpen} onToggle={() => setJsonOpen((o) => !o)} />
         <Timeline segs={view.segs} note={view.timelineNote} />
 
-        {view.showAsk && <QuestionModal hint={view.askHint} onAnswer={answer} />}
+        {view.showAsk && view.question && (
+          <QuestionModal text={view.question.text} options={view.question.options} defaultAnswer={view.question.defaultAnswer} hint={view.askHint} onAnswer={answer} />
+        )}
 
-        <AgentPanel detail={detail} open={panelOpen} onClose={closePanel} askMode={view.askMode} answer={view.answer} scoreChips={view.scoreChips} />
+        <AgentPanel detail={detail} open={panelOpen} onClose={closePanel} askMode={view.askMode} answer={view.answer} scoreChips={view.scoreChips} sketchImage={sketchImage} elements={view.elements} />
       </div>
     </div>
   );

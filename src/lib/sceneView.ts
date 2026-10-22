@@ -1,7 +1,7 @@
 // SceneState + gerçek zaman → ekranın görünümü. Saf fonksiyonlar; bileşenler yalnızca bunu bilir.
 
 import { CHARACTER_IDS, STATE_NAMES, type CharacterId, type CharacterState } from "@/components/character/faces";
-import type { Answer } from "./events";
+import type { Answer, FoundElement } from "./events";
 import { AGENTS, AUTO, OUT_LABELS, SCORE_THRESHOLD, SLOT_W, SPEC_W, TIMELINE_PLAN, findAgent } from "./agents";
 import { nowOf, type SceneState } from "./sceneState";
 import { SPEC_LINES, SPEC_SECTIONS } from "./spec";
@@ -79,6 +79,9 @@ export interface SceneView {
   askMode: "pending" | "asking" | "answered";
   answer: Answer;
   reveal: number;
+  /** Okuyucunun gerçek sonuçları (boşsa demo kroki kutuları kullanılır) */
+  elements: FoundElement[];
+  question: { text: string; options: string[]; defaultAnswer: Answer } | null;
   foundText: string;
   sketchHashText: string;
   spec: { visible: boolean; returning: boolean; left: number; version: number; fields: number; owner: string };
@@ -192,7 +195,9 @@ export function deriveScene(state: SceneState, T: number): SceneView {
     };
   });
 
-  const reveal = now < 1.5 ? 0 : Math.min(9, Math.floor((now - 1.5) / 0.4) + 1);
+  const real = state.elements.length > 0;
+  const reveal = real ? state.elements.length : now < 1.5 ? 0 : Math.min(9, Math.floor((now - 1.5) / 0.4) + 1);
+  const avgConf = real ? state.elements.reduce((sum, el) => sum + el.confidence, 0) / state.elements.length : 0.89;
   const q = state.question;
   const remaining = q ? Math.max(0, Math.ceil(q.timeoutSec - (T - (q.at + state.wait)))) : AUTO;
 
@@ -205,7 +210,9 @@ export function deriveScene(state: SceneState, T: number): SceneView {
     askMode: answered ? "answered" : q ? "asking" : "pending",
     answer,
     reveal,
-    foundText: reveal > 0 ? `${reveal} öğe · ort. güven 0.89` : "henüz okunmadı",
+    elements: state.elements,
+    question: q ? { text: q.text, options: q.options, defaultAnswer: q.defaultAnswer } : null,
+    foundText: reveal > 0 ? `${reveal} öğe · ort. güven ${avgConf.toFixed(2)}` : "henüz okunmadı",
     sketchHashText: (state.spec["provenance.sketchHash"] as string | undefined) ?? "—",
     spec: {
       visible: started,
@@ -242,6 +249,7 @@ export interface AgentDetail {
   dur: string;
   els?: { n: string; c: string; w: number; tone: Tone }[];
   answerText?: string;
+  askedText?: string;
   attempts?: { n: number; lvl: number; note: string; dur: string; score: string; tone: Tone }[];
   attemptCount?: string;
   cmpLevel?: number;
@@ -262,7 +270,18 @@ export function deriveAgentDetail(id: CharacterId, state: SceneState, T: number)
   const answered = state.answer !== null;
   const ansLow = state.answer?.value === "Görsel" ? "görsel" : "buton";
 
-  if (id === "reader") {
+  if (id === "reader" && state.elements.length > 0) {
+    d.els = state.elements.map((el) => ({
+      n: `${el.type}#${el.id}${el.note ? " · " + el.note : ""}`,
+      c: el.confidence.toFixed(2),
+      w: Math.round(el.confidence * 100),
+      tone: el.confidence < 0.7 && !el.confirmed ? "warn" : "none",
+    }));
+    d.askedText = state.asked?.text ?? "—";
+    const a = state.answer;
+    d.answerText = a ? a.value + (a.skipped ? " (atlandı)" : a.auto ? " (süre doldu)" : "") : state.asked ? "bekleniyor" : "soru gerekmedi";
+  } else if (id === "reader") {
+    d.askedText = state.asked?.text;
     const els: [string, number][] = [["menü", 0.97], ["başlık", 0.95], ["alt metin", 0.88], ["görsel", 0.93], ["kutu#5", answered ? 0.96 : 0.52], ["kart", 0.90], ["kart", 0.89], ["kart", 0.91], ["alt bilgi", 0.84]];
     d.els = els.map((e, i) => ({
       n: i === 4 ? (answered ? "kutu#5 → " + ansLow : "kutu#5 · belirsiz") : e[0],

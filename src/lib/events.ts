@@ -9,11 +9,27 @@ import { z } from "zod";
 import { specPathSchema } from "./spec";
 
 export const agentIdSchema = z.enum(["reader", "designer", "generator", "critic", "notary"]);
-export const answerSchema = z.enum(["Buton", "Görsel"]);
+/** Kullanıcının seçtiği cevap: sorudaki seçenek etiketlerinden biri (ör. "Buton"). */
+export const answerSchema = z.string().min(1);
 export type Answer = z.infer<typeof answerSchema>;
 
 /** "Olaylar" listesine düşecek satır; yoksa olay günlüğe yazılmaz. */
 const logSchema = z.object({ agent: agentIdSchema, text: z.string() });
+
+export const ELEMENT_TYPES = ["menü", "başlık", "metin", "buton", "görsel", "kart", "logo", "ikon", "form", "diğer"] as const;
+export type ElementType = (typeof ELEMENT_TYPES)[number];
+
+/** Okuyucunun krokide bulduğu öğe. box: [x1, y1, x2, y2], 0–1000 normalize koordinat. */
+export const foundElementSchema = z.object({
+  id: z.number().int().positive(),
+  type: z.enum(ELEMENT_TYPES),
+  box: z.array(z.number().min(0).max(1000)).length(4),
+  confidence: z.number().min(0).max(1),
+  note: z.string(),
+  /** Kullanıcı sorusuyla netleşti */
+  confirmed: z.boolean().default(false),
+});
+export type FoundElement = z.infer<typeof foundElementSchema>;
 
 const base = { t: z.number().nonnegative(), log: logSchema.optional() };
 
@@ -46,6 +62,9 @@ export const agentEventSchema = z.discriminatedUnion("type", [
     text: z.string().nullable(),
   }),
 
+  /** Okuyucunun bulduğu öğeler (her gelişinde listenin tamamı yerine geçer). */
+  z.object({ type: z.literal("elements_found"), ...base, elements: z.array(foundElementSchema) }),
+
   /** Agent kullanıcıya soru soruyor; script zamanı durur. */
   z.object({
     type: z.literal("agent_question"),
@@ -53,7 +72,7 @@ export const agentEventSchema = z.discriminatedUnion("type", [
     agent: agentIdSchema,
     question: z.string(),
     bubble: z.string(),
-    options: z.array(answerSchema).min(1),
+    options: z.array(answerSchema).min(2),
     /** Bu süre (gerçek sn) içinde cevap gelmezse defaultAnswer kendiliğinden verilir. */
     timeoutSec: z.number().positive(),
     defaultAnswer: answerSchema,
