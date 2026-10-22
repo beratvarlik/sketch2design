@@ -100,7 +100,7 @@
   justify-content: center;
   gap: 10px;
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
   transition: transform 0.15s ease, background 0.2s ease;
   white-space: nowrap;
 }

@@ -6,7 +6,7 @@ import "./globals.css";
 const bricolage = Bricolage_Grotesque({
   variable: "--font-bricolage",
   subsets: ["latin", "latin-ext"],
-  weight: ["600", "800"],
+  axes: ["opsz"],
 });
 
 const caveat = Caveat({
@@ -26,7 +26,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Sketch2Design",
+  title: "Sketch2Design — Açılış",
   description: "Krokini çiz, beş agent tasarıma çevirsin, sonuç Monad'a mühürlensin.",
 };
 

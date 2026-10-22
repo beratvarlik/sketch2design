@@ -181,7 +181,7 @@ export default function RunScene() {
               <span className={s.outLabel}>{view.outLabel}</span>
             </div>
             <div className={`${s.outWrap} ${view.outBusy ? s.busy : ""}`}>
-              <ScaledOutput level={view.outLevel} width={320} />
+              <ScaledOutput level={view.outLevel} width={320} radius={8} />
             </div>
             <div className={s.palette} style={{ opacity: view.paletteDim ? 0.25 : 1 }}>
               {PALETTES[0].c.map((hex) => (

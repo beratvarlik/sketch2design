@@ -48,7 +48,7 @@
 }
 .btn:hover { transform: translateY(-1px); }
 .btn:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
-.btnPrimary { background: var(--accent); color: #fff; padding: 0 24px; font-size: 20px; font-weight: 700; }
+.btnPrimary { background: var(--accent); color: var(--on-accent); padding: 0 24px; font-size: 20px; font-weight: 700; }
 .btnPrimary:hover { background: var(--accent-hover); }
 .btnGhost { background: transparent; color: var(--text-2); padding: 0 16px; font-size: 19px; font-weight: 600; }
 .btnGhost:hover { background: var(--surface); color: var(--text); }

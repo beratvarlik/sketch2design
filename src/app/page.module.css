@@ -40,7 +40,7 @@
   transition: transform 0.15s ease, background 0.2s ease;
 }
 .btn:hover { transform: translateY(-1px); }
-.btnPrimary { background: var(--accent); color: #fff; }
+.btnPrimary { background: var(--accent); color: var(--on-accent); }
 .btnPrimary:hover { background: var(--accent-hover); }
 .btnLg { height: 62px; padding: 0 30px; font-size: 20px; border-radius: 14px; }
 

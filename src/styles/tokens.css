@@ -23,6 +23,7 @@
   --paper-margin: rgba(200, 80, 70, 0.32); /* kenar kırmızı çizgi */
   --pencil: #2B2925;
   --pencil-2: #5A544A;
+  --paper-ink: #1A1814;        /* kağıt üstündeki koyu yüzeyler: aktif araç, ipucu baloncuğu, düğmeler */
   --tape: rgba(226, 210, 166, 0.60);
 
   /* tek vurgu: Monad moru */
@@ -30,6 +31,7 @@
   --accent-hover: #7F68FF;
   --accent-text: #A898FF;       /* koyu zeminde link/metin */
   --accent-soft: rgba(110, 84, 255, 0.14);
+  --on-accent: #FFFFFF;         /* vurgu rengi üstündeki metin */
   --accent-ink: #5B43E0;        /* kağıt üstünde tespit kutuları */
   --focus: #C9BEFF;
 
@@ -38,6 +40,7 @@
   --success-text: #86DDA6;
   --danger: #E5484D;
   --danger-text: #FF9A94;
+  --danger-bubble: #F6E2D6;     /* hata balonu zemini (kağıt üstü) */
   --warn: #E8A21A;
 
   /* agent renkleri — SADECE karakterler ve zaman çizelgesi */

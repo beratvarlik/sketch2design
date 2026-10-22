@@ -75,8 +75,8 @@
 .al_r .bubble::after { left: auto; right: 94px; }
 
 .b_ask { animation: askBob 1.1s ease-in-out infinite; }
-.b_err { background: color-mix(in srgb, var(--paper) 80%, var(--danger)); }
-.b_err::after { border-top-color: color-mix(in srgb, var(--paper) 80%, var(--danger)); }
+.b_err { background: var(--danger-bubble); }
+.b_err::after { border-top-color: var(--danger-bubble); }
 
 .steps { display: inline-flex; gap: 5px; margin-left: 8px; vertical-align: middle; }
 .steps i { width: 8px; height: 8px; border-radius: 50%; border: 1.6px solid var(--pencil); box-sizing: border-box; }

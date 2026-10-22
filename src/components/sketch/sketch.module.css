@@ -29,4 +29,4 @@
 .tag { fill: var(--accent-ink); }
 .boxUnsure { fill: color-mix(in srgb, var(--warn) 16%, transparent); stroke: color-mix(in srgb, var(--warn) 55%, black); }
 .tagUnsure { fill: color-mix(in srgb, var(--warn) 55%, black); }
-.tagText { font-family: var(--mono); font-size: 10.5px; fill: #fff; }
+.tagText { font-family: var(--mono); font-size: 10.5px; fill: var(--on-accent); }

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Character from "@/components/character/Character";
 import ScaledOutput from "@/components/output/ScaledOutput";
 import Sketch from "@/components/sketch/Sketch";
@@ -36,13 +36,21 @@ export default function AgentPanel({ detail, open, onClose, askMode, answer, sco
   const { info } = detail;
   const id = info.id;
 
+  const closeBtn = useRef<HTMLButtonElement>(null);
+
+  // Açılınca odak panele girer, kapanınca paneli açan öğeye döner; Esc kapatır.
   useEffect(() => {
     if (!open) return;
+    const opener = document.activeElement as HTMLElement | null;
+    closeBtn.current?.focus();
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      opener?.focus();
+    };
   }, [open, onClose]);
 
   return (
@@ -53,7 +61,7 @@ export default function AgentPanel({ detail, open, onClose, askMode, answer, sco
           <h2 className={s.name}>{info.name}</h2>
           <span className={s.quote}>{info.quote}</span>
         </div>
-        <button type="button" className={s.x} onClick={onClose} aria-label="Paneli kapat">
+        <button ref={closeBtn} type="button" className={s.x} onClick={onClose} aria-label="Paneli kapat">
           <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round">
             <path d="M6.2 6.6 Q12 12.3 17.8 17.6 M17.5 6.3 Q12.2 11.8 6.4 17.9" />
           </svg>

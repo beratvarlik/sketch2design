@@ -4,9 +4,11 @@ interface ScaledOutputProps {
   level: number;
   /** Küçültülmüş genişlik (px); orijinal 300×520 oranı korunur. */
   width: number;
+  /** Çerçeve köşe yarıçapı (px) */
+  radius?: number;
 }
 
-export default function ScaledOutput({ level, width }: ScaledOutputProps) {
+export default function ScaledOutput({ level, width, radius = 6 }: ScaledOutputProps) {
   const k = width / 300;
   return (
     <div
@@ -14,7 +16,7 @@ export default function ScaledOutput({ level, width }: ScaledOutputProps) {
         width,
         height: Math.round(520 * k),
         overflow: "hidden",
-        borderRadius: 6,
+        borderRadius: radius,
         lineHeight: 0,
         flex: "none",
         boxShadow: "0 0 0 1px var(--line-strong)",

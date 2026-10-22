@@ -84,8 +84,8 @@
   position: relative;
   max-width: 360px;
   padding: 12px 18px 14px;
-  background: var(--surface);
-  color: var(--text);
+  background: var(--paper-ink);
+  color: var(--paper);
   font-family: var(--hand);
   font-weight: 600;
   font-size: 28px;
@@ -101,7 +101,7 @@
   margin-left: -8px;
   border-left: 8px solid transparent;
   border-right: 6px solid transparent;
-  border-top: 13px solid var(--surface);
+  border-top: 13px solid var(--paper-ink);
 }
 
 .emptyActions { display: flex; gap: 10px; pointer-events: auto; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
@@ -123,9 +123,9 @@
 }
 .btn:hover { transform: translateY(-1px); }
 .btn:focus-visible, .upl:focus-within { outline: 3px solid var(--focus); outline-offset: 3px; }
-.btnInk { border: 0; background: var(--surface); color: var(--text); }
-.btnInk:hover { background: var(--surface-3); }
-.btnInkOutline { background: transparent; color: var(--pencil); border: 2px solid var(--pencil); }
+.btnInk { border: 0; background: var(--paper-ink); color: var(--paper); }
+.btnInk:hover { background: var(--pencil); }
+.btnInkOutline { background: transparent; color: var(--paper-ink); border: 2px solid var(--paper-ink); }
 .upl { position: relative; }
 
 .foot {

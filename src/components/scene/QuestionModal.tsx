@@ -11,13 +11,39 @@ interface QuestionModalProps {
 
 export default function QuestionModal({ hint, onAnswer }: QuestionModalProps) {
   const first = useRef<HTMLButtonElement>(null);
+  const card = useRef<HTMLDivElement>(null);
+
+  // Odak modala girer, Tab modal içinde döner, kapanınca önceki öğeye geri gelir.
   useEffect(() => {
+    const opener = document.activeElement as HTMLElement | null;
     first.current?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Tab" || !card.current) return;
+      const items = Array.from(card.current.querySelectorAll<HTMLElement>("button"));
+      if (!items.length) return;
+      const firstEl = items[0];
+      const lastEl = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === firstEl) {
+        e.preventDefault();
+        lastEl.focus();
+      } else if (!e.shiftKey && document.activeElement === lastEl) {
+        e.preventDefault();
+        firstEl.focus();
+      } else if (!card.current.contains(document.activeElement)) {
+        e.preventDefault();
+        firstEl.focus();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      opener?.focus();
+    };
   }, []);
 
   return (
     <div className={s.wrap}>
-      <div className={s.card} role="dialog" aria-modal="true" aria-labelledby="s2d-q-title">
+      <div ref={card} className={s.card} role="dialog" aria-modal="true" aria-labelledby="s2d-q-title">
         <svg className={s.frame} aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="none">
           <path d="M1.2 2 Q30 0.6 60 1.6 T98.6 1.4 Q99.6 30 98.8 62 T98.4 98.4 Q70 99.6 40 98.6 T1.6 98.8 Q0.4 70 1.4 40 T1.2 2 Z" />
         </svg>

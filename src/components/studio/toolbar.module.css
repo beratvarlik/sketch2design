@@ -18,7 +18,7 @@
 }
 .tool:hover { background: var(--surface); color: var(--text); }
 .tool:focus-visible, .upl:focus-within { outline: 3px solid var(--focus); outline-offset: 3px; }
-.tool.on { background: var(--paper); color: var(--pencil); }
+.tool.on { background: var(--paper); color: var(--paper-ink); }
 .tool.on::before {
   content: "";
   position: absolute;
@@ -42,7 +42,7 @@
   padding: 6px 11px;
   border-radius: var(--r-sm);
   background: var(--paper);
-  color: var(--pencil);
+  color: var(--paper-ink);
   font-family: var(--hand);
   font-size: 22px;
   font-weight: 600;

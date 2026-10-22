@@ -12,17 +12,14 @@ interface TeamMemberProps {
   quote: string;
 }
 
-// Üstüne gelince (ya da odaklanınca) karakter "çalışıyor" durumuna geçer.
+// Üstüne gelince karakter "çalışıyor" durumuna geçer.
 export default function TeamMember({ id, name, role, quote }: TeamMemberProps) {
   const [active, setActive] = useState(false);
   return (
     <article
       className={`${s.member} ag-${id}`}
-      tabIndex={0}
       onMouseEnter={() => setActive(true)}
       onMouseLeave={() => setActive(false)}
-      onFocus={() => setActive(true)}
-      onBlur={() => setActive(false)}
     >
       <div className={s.quote}>
         <span className={s.bubble}>{quote}</span>
